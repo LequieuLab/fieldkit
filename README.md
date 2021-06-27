@@ -13,8 +13,8 @@ fieldkit is a Python package used to visualize and manipulate 1D, 2D, and 3D fie
 		2. [write_to_file](#write_to_file)
 		3. [write_to_VTK](#write_to_VTK)
 		4. [Example 1](#example1)
-3. [Initializing 3D Phases with 2 or 3 species](#intialize)
-	1. [intialize_phase](#intialize_phase)
+3. [Initializing 3D Phases with 2 or 3 species](#initialize)
+	1. [intialize_phase](#initialize_phase)
 	2. [Example 2](#example2)
 4. [Manipulating Fields](#manipulate)
 	1. [change_resolution](#change_resolution)
@@ -139,10 +139,10 @@ The following phases are implemented in the initialize_phase function.
 
 This function is found in field_initialize.py
 
-#### intialize_phase(phase, npw, h) <a name="intialize_phase"></a>
+#### initialize_phase(phase, npw, h) <a name="initialize_phase"></a>
 > Creates a list of Field objects for 3D phases with 2 or 3 species. 
 >    
-> Adapted from FTS-tools/field/init_fields_3d_2spec.py and from FTS-tools/fields/ini_fields_3d_3spec.py.
+> Adapted from FTS-tools/field/init_fields_3d_2spec.py and from FTS-tools/fields/init_fields_3d_3spec.py.
 >    
 > Args:
 > * phase: name of the phase (see description above for phases implemented in this function)
@@ -166,10 +166,10 @@ import numpy as np
 npw = (32,32,32)
 h = np.eye(3) * 2
 
-new_field = fk.intialize_phase("A15", npw, h)	
+new_field = fk.initialize_phase("A15", npw, h)	
 fk.write_to_VTK("A15.vtk", new_field)
 
-new_field = fk.intialize_phase("alt-C15", npw, h)	
+new_field = fk.initialize_phase("alt-C15", npw, h)	
 fk.write_to_VTK("alt-C15.vtk", new_field)
 
 #outputs A15.vtk and alt-C15.vtk
@@ -179,7 +179,7 @@ fk.write_to_VTK("alt-C15.vtk", new_field)
 ## Manipulating Fields <a name="manipulate"></a>
 All function are found in field_manip.py
 
-#### change_resolution(field_old, resolution_new) <a name="change_resolution"></a>
+#### change_resolution(fields_old, resolution_new) <a name="change_resolution"></a>
 > For a list of Field objects, change the resolution of each Field object.
 >
 > Args:
@@ -190,7 +190,7 @@ All function are found in field_manip.py
 > * field_new: a list of Field objects with each object set to a resolution of resolution_new.
 
 
-#### replicate_field(fields, nreplicates) <a name="replicate_field"></a>
+#### replicate_fields(fields, nreplicates) <a name="replicate_field"></a>
 > For a list of Fields, replicate each Field object by nreplicates.
 >
 > Adapted from FTS-tools/replicate_fields.py and FTS-tools/lib/fieldtools.py.
@@ -225,8 +225,8 @@ fk.write_to_VTK("repfields.vtk", field_new)
 ###### matplotlib example
 ```
 filename = "density_1D.dat"
-fields = fk.ReadFromFile(filename)
-newfields = fk.ReplicateFields(fields, 3)
+fields = fk.read_from_file(filename)
+newfields = fk.replicate_fields(fields, 3)
 
 #very basic plotting
 plt.figure

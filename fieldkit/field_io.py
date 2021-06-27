@@ -226,7 +226,7 @@ def write_to_VTK(filename, fields):
    
     #Check if vtk file is already in current directory
     if os.path.isfile(filename):
-        print("File '{}' already exist".format(filename))
+        raise Exception("File '{}' already exist".format(filename))
         return None
     
     #Check if fields in Field object are compatible for VTK
