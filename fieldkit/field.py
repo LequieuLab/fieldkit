@@ -27,10 +27,20 @@ class Field:
         if np.all(npw_Nd != None):
             self.npw_Nd = tuple(npw_Nd)
             self.npw_total = np.prod(npw_Nd)
+        
+        # initialize data
         if np.all(data != None):
             self.set_data(data)
+        elif np.all(npw_Nd != None): 
+            self.data= np.zeros(npw_Nd) # default to zeros
+        
+        # initialize h
         if np.all(h != None):
             self.set_h(h)
+        else: 
+            self.set_h(np.eye(self.dim)) # default to identity
+        
+
 
     def set_h(self,h):
         """ Checks that h is square and sets coords. """

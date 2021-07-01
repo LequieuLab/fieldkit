@@ -4,6 +4,7 @@
 import numpy as np
 
 from .field import *
+from .field_io import *
     
 def update_species_field_gaussians(field, centers, npw, magnitude, x, y, z):
     #parameters for all spheres phases
@@ -186,9 +187,55 @@ def initialize_phase(phase, npw, h):
     
     
     
+def add_ellipse(field, center, axis_lengths, smoothing_width = 0.05,height=1):
+    """ adds an elipse
     
+    Args:
+        field: field to add ellipse to (edited in place)
+        center: center of ellipse (in scaled [0-1])
+        axis_lengths: lengths of ellipse axis in each dimension (in scaled [0-1])
+        smoothing_width: sigma to use for smoothing gaussian filter
+        height : height of ellipse
+     
+    Returns:
+        field: field edited in place
+        
+    Raises:
+        None currently.
+
+    """
     
+  
+    npw = field.npw_Nd
+    dim = len(npw)
+    assert(len(axis_lengths) == dim)
+    dx = np.zeros(dim)
+    data = np.zeros(npw)
+
+    for index in np.ndindex(npw):
+        scaled_index = index / np.array(npw)
+        # Equation of ellipse: x**2/a**2 + y**2/b**2 + z**2/c**2  = 1
+        dist2 = 0
+        for idim in range(dim):
+          dx[idim] = scaled_index[idim] - center[idim]
+          if dx[idim] > 0.5:   dx[idim] -= 1.0
+          if dx[idim] < -0.5:  dx[idim] += 1.0
+          dist2 += dx[idim]*dx[idim] / axis_lengths[idim]**2
+  
+        if dist2 < 1: # is inside ellipse
+          data[index] += height
+        else: # outside ellipse 
+          pass
     
+    # now smear using gaussian filter
+    import scipy.ndimage 
+    data_smooth=np.zeros(npw)
+    sigma = [int(i*smoothing_width) for i in npw] 
+    scipy.ndimage.gaussian_filter(data,sigma=sigma,output=data_smooth, mode='wrap')
+
+    # return in place 
+    field.data += data_smooth
+     
         
         
         

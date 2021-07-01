@@ -151,7 +151,7 @@ def write_to_file(filename, fields):
           fout.write("%16.10g " % fields[n].data[ix].real)
           fout.write("%16.10g " % fields[n].data[ix].imag)
         else:
-          fout.write("%16.10g " % fields[ix][n])
+          fout.write("%16.10g " % fields[n].data[ix])
       fout.write("\n")
 
   elif dim == 2:
