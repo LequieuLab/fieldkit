@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 from .field import *
 
@@ -102,5 +103,35 @@ def replicate_fields(fields, nreplicates):
 
     return field_list
         
+def roll(fields, shift):
+    """ roll the fields across the PBC using shift
+    Args:
+        fields: a list of Field objects
+        shift: list of length dim. How much to roll the fields. In range [0-1].
+
+    Returns: 
+        fields_new: a list of Field objects, in which each Field object has been translated. 
+
+    """
+
+    fields_new = []
+    for field in fields:    
+        npw = field.npw_Nd
+        dim = field.dim
+        assert(len(shift) == dim)
+
+        field_new = copy.deepcopy(field) # ensure deep copy
+        
+        myshift=np.zeros(dim,dtype=int) # must be an integer
+        myaxis = tuple(np.arange(dim))
+        for idim in myaxis:
+            myshift[idim] = int(shift[idim]*npw[idim])
+        
+        field_new.data = np.roll(field.data, myshift, axis=myaxis)
+        fields_new.append(field_new)
+   
+    return fields_new 
+
+
 
 
