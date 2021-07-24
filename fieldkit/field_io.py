@@ -219,15 +219,13 @@ def write_to_VTK(filename, fields):
   
     Returns:
         A VTK file based on fields.
-        
-    Raises: 
-        If VTK file already exist, the function exits 
+    
    """
    
     #Check if vtk file is already in current directory
     if os.path.isfile(filename):
-        raise Exception("File '{}' already exist".format(filename))
-        return None
+        print("File '{}' already exist, file will be overwritten".format(filename))
+    
     
     #Check if fields in Field object are compatible for VTK
     for i in range(1,len(fields)):
