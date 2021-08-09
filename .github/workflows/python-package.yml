@@ -5,9 +5,9 @@ name: Integration tests on fieldkit functions with pytest
 
 on:
   push:
-    branches: [ fieldkit-tests ]
+    branches: [ master, fieldkit-tests ]
   pull_request:
-    branches: [ fieldkit-tests ]
+    branches: [ master, fieldkit-tests ]
 
 jobs:
   build:
