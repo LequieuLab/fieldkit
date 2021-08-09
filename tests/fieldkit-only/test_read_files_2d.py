@@ -14,4 +14,4 @@ def test_all():
     assert(fields[0].data[20,1] == 0.0413537591)
     assert(fields[0].data[31,31] == 0.9816982147)
 
-    #tests the read_from_file function
+    #tests the read_from_file function in 2d
