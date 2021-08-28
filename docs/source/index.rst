@@ -13,9 +13,16 @@ Welcome to fieldkit's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Started 
+
+   getting_started 
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Module
 
    modules
+
 
 
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>fieldkit &mdash; fieldkit 08/28/2021 documentation</title>
+  <title>Getting Started with fieldkit &mdash; fieldkit 08/28/2021 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="fieldkit package" href="fieldkit.html" />
-    <link rel="prev" title="Getting Started with fieldkit" href="getting_started.html" /> 
+    <link rel="next" title="fieldkit" href="modules.html" />
+    <link rel="prev" title="Welcome to fieldkit’s documentation!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,11 +83,13 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with fieldkit</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">fieldkit</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fieldkit.html">fieldkit package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with fieldkit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-paraview">Installing Paraview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-pythonpath">Setting PYTHONPATH</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">fieldkit</a></li>
 </ul>
 
             
@@ -136,13 +138,13 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>fieldkit</li>
+      <li>Getting Started with fieldkit</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,16 +157,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="fieldkit">
-<h1>fieldkit<a class="headerlink" href="#fieldkit" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="fieldkit.html">fieldkit package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fieldkit.html#module-fieldkit.field">Field class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fieldkit.html#module-fieldkit.field_initialize">fieldkit.field_initialize module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fieldkit.html#module-fieldkit.field_io">fieldkit.field_io module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fieldkit.html#module-fieldkit.field_manip">fieldkit.field_manip module</a></li>
+  <div class="section" id="getting-started-with-fieldkit">
+<h1>Getting Started with fieldkit<a class="headerlink" href="#getting-started-with-fieldkit" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>The following Python packages and software must be installed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>numpy - to run most fieldkit functions</p></li>
+<li><p>matplotlib or gnuplot - to model 1D fields</p></li>
+<li><p>Paraview - to model 2D and 3D fields</p></li>
+<li><p>Pytest (optional) - to run unit tests in the tests folder</p></li>
 </ul>
+</div></blockquote>
+</div>
+<div class="section" id="installing-paraview">
+<h2>Installing Paraview<a class="headerlink" href="#installing-paraview" title="Permalink to this headline">¶</a></h2>
+<p><strong>On Ubuntu/Debian</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">paraview</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-pythonpath">
+<h2>Setting PYTHONPATH<a class="headerlink" href="#setting-pythonpath" title="Permalink to this headline">¶</a></h2>
+<p>If Python does not recognize fieldkit as an installed Python package</p>
+<ul>
+<li><p>For one session:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;$HOME/FTS-tools&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>By default for any terminal session:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vim</span> <span class="o">~/.</span><span class="n">bashrc</span>
+<span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;$HOME/FTS-tool&quot;</span>
+</pre></div>
+</div>
 </li>
 </ul>
 </div>
@@ -176,8 +203,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="fieldkit.html" class="btn btn-neutral float-right" title="fieldkit package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started with fieldkit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="fieldkit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to fieldkit’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
