@@ -23,11 +23,6 @@ Welcome to fieldkit's documentation!
 
    modules
 
-.. toctree::
-   :maxdepth: 2
-   :caption:  Reference
-
-   :ref:`genindex`
 
 
 
