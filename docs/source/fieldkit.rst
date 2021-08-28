@@ -10,7 +10,7 @@ Field class
    :undoc-members:
    :show-inheritance:
 
-fieldkit.field\_initialize module
+field\_initialize module
 ---------------------------------
 
 .. automodule:: fieldkit.field_initialize
@@ -18,7 +18,7 @@ fieldkit.field\_initialize module
    :undoc-members:
    :show-inheritance:
 
-fieldkit.field\_io module
+field\_io module
 -------------------------
 
 .. automodule:: fieldkit.field_io
@@ -26,7 +26,7 @@ fieldkit.field\_io module
    :undoc-members:
    :show-inheritance:
 
-fieldkit.field\_manip module
+field\_manip module
 ----------------------------
 
 .. automodule:: fieldkit.field_manip
