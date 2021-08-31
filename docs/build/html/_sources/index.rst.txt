@@ -12,10 +12,19 @@ Welcome to fieldkit's documentation!
    This project is under active development
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Getting Started 
 
    getting_started 
+   create_field
+   initialize_phases
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Additional References
+
+   manipulate_fields
+   visualize
 
 .. toctree::
    :maxdepth: 2

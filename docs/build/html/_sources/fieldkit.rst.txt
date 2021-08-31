@@ -14,7 +14,7 @@ field\_initialize module
 ---------------------------------
 
 .. automodule:: fieldkit.field_initialize
-   :members:
+   :members: add_ellipse, initialize_phase
    :undoc-members:
    :show-inheritance:
 
@@ -22,7 +22,7 @@ field\_io module
 -------------------------
 
 .. automodule:: fieldkit.field_io
-   :members:
+   :members: read_from_file, write_to_file, write_to_VTK
    :undoc-members:
    :show-inheritance:
 
@@ -30,7 +30,7 @@ field\_manip module
 ----------------------------
 
 .. automodule:: fieldkit.field_manip
-   :members:
+   :members: change_resolution, replicate_fields, roll
    :undoc-members:
    :show-inheritance:
 

@@ -82,6 +82,13 @@
               <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with fieldkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../create_field.html">Creating a Field</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../initialize_phases.html">Initializing 3D Phases with 2 or 3 species</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../manipulate_fields.html">Manipulating Fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualize.html">Visualizing Fields</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Module</span></p>
 <ul>
@@ -270,7 +277,7 @@
     <span class="k">return</span> <span class="n">field</span></div>
     
      
-<div class="viewcode-block" id="initialize_phase"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field_initialize.initialize_phase">[docs]</a><span class="k">def</span> <span class="nf">initialize_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">npw</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>    
+<div class="viewcode-block" id="initialize_phase"><a class="viewcode-back" href="../../initialize_phases.html#fieldkit.field_initialize.initialize_phase">[docs]</a><span class="k">def</span> <span class="nf">initialize_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">npw</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>    
     <span class="sd">&quot;&quot;&quot; Creates a list of Field objects for 3D phases with 2 or 3 species. </span>
 <span class="sd">    </span>
 <span class="sd">    Adapted from FTS-tools/field/init_fields_3d_2spec.py and from FTS-tools/fields/ini_fields_3d_3spec.py.</span>
@@ -341,7 +348,7 @@
     
     
     
-<div class="viewcode-block" id="add_ellipse"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field_initialize.add_ellipse">[docs]</a><span class="k">def</span> <span class="nf">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">axis_lengths</span><span class="p">,</span> <span class="n">smoothing_width</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="add_ellipse"><a class="viewcode-back" href="../../initialize_phases.html#fieldkit.field_initialize.add_ellipse">[docs]</a><span class="k">def</span> <span class="nf">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">axis_lengths</span><span class="p">,</span> <span class="n">smoothing_width</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span><span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; adds an elipse</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>

@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Initializing 3D Phases with 2 or 3 species &mdash; fieldkit 08/28/2021 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Manipulating Fields" href="manipulate_fields.html" />
+    <link rel="prev" title="Creating a Field" href="create_field.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> fieldkit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with fieldkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create_field.html">Creating a Field</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Initializing 3D Phases with 2 or 3 species</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Additional References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="manipulate_fields.html">Manipulating Fields</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Module</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">fieldkit</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">fieldkit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Initializing 3D Phases with 2 or 3 species</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/initialize_phases.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-fieldkit.field_initialize">
+<span id="initializing-3d-phases-with-2-or-3-species"></span><h1>Initializing 3D Phases with 2 or 3 species<a class="headerlink" href="#module-fieldkit.field_initialize" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="fieldkit.field_initialize.add_ellipse">
+<code class="sig-prename descclassname">fieldkit.field_initialize.</code><code class="sig-name descname">add_ellipse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">center</span></em>, <em class="sig-param"><span class="n">axis_lengths</span></em>, <em class="sig-param"><span class="n">smoothing_width</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">height</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fieldkit/field_initialize.html#add_ellipse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fieldkit.field_initialize.add_ellipse" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds an elipse</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> – field to add ellipse to (edited in place)</p></li>
+<li><p><strong>center</strong> – center of ellipse (in scaled [0-1])</p></li>
+<li><p><strong>axis_lengths</strong> – lengths of ellipse axis in each dimension (in scaled [0-1])</p></li>
+<li><p><strong>smoothing_width</strong> – sigma to use for smoothing gaussian filter</p></li>
+<li><p><strong>height</strong> – height of ellipse</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>field edited in place</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>field</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>None currently.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="fieldkit.field_initialize.initialize_phase">
+<code class="sig-prename descclassname">fieldkit.field_initialize.</code><code class="sig-name descname">initialize_phase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phase</span></em>, <em class="sig-param"><span class="n">npw</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fieldkit/field_initialize.html#initialize_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fieldkit.field_initialize.initialize_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a list of Field objects for 3D phases with 2 or 3 species.</p>
+<p>Adapted from FTS-tools/field/init_fields_3d_2spec.py and from FTS-tools/fields/ini_fields_3d_3spec.py.
+2 species 3D phases implemented in this function: A15. C15, double-gyroid, single-diamond
+3 species 3D phases implemented in this function: alt- diamond, alt-C15.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phase</strong> – name of the phase (see description above for phases implemented in this function)</p></li>
+<li><p><strong>= number of grid points for each dimension</strong> (<em>npw</em>) – </p></li>
+<li><p><strong>= a cell tensor</strong> (<em>h</em>) – </p></li>
+<li><p><strong>which the columns are box vectors that describe the coordinate system</strong> (<em>in</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of Field objects, each object for each species.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>field_list</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – if phase is not a phases implemented in this function (see description above), the function will exit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>The following example outputs vtk files for Field objects created by the initialize_phase function.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1">#parameters</span>
+<span class="n">npw</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="n">new_field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">initialize_phase</span><span class="p">(</span><span class="s2">&quot;A15&quot;</span><span class="p">,</span> <span class="n">npw</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">write_to_VTK</span><span class="p">(</span><span class="s2">&quot;A15.vtk&quot;</span><span class="p">,</span> <span class="n">new_field</span><span class="p">)</span>
+
+<span class="n">new_field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">initialize_phase</span><span class="p">(</span><span class="s2">&quot;alt-C15&quot;</span><span class="p">,</span> <span class="n">npw</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">write_to_VTK</span><span class="p">(</span><span class="s2">&quot;alt-C15.vtk&quot;</span><span class="p">,</span> <span class="n">new_field</span><span class="p">)</span><span class="n">a</span>
+</pre></div>
+</div>
+<p>This examples shows how to add one of more ellipses in 1D/2D.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#1d</span>
+<span class="n">npw</span> <span class="o">=</span> <span class="p">[</span><span class="mi">64</span><span class="p">]</span>
+<span class="n">field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">npw_Nd</span><span class="o">=</span><span class="n">npw</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">[</span><span class="mf">0.25</span><span class="p">])</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;fields.in&quot;</span><span class="p">,[</span><span class="n">field</span><span class="p">])</span>
+
+<span class="c1">#2d</span>
+<span class="n">npw</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">64</span><span class="p">)</span>
+<span class="n">field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">npw_Nd</span><span class="o">=</span><span class="n">npw</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span><span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;fields.in&quot;</span><span class="p">,[</span><span class="n">field</span><span class="p">])</span>
+
+<span class="c1"># 2d multiple ellipse</span>
+<span class="n">npw</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">64</span><span class="p">)</span>
+<span class="n">field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">npw_Nd</span><span class="o">=</span><span class="n">npw</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span><span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span><span class="n">height</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">smoothing_width</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span><span class="n">height</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">smoothing_width</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;fields.in&quot;</span><span class="p">,[</span><span class="n">field</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="manipulate_fields.html" class="btn btn-neutral float-right" title="Manipulating Fields" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="create_field.html" class="btn btn-neutral float-left" title="Creating a Field" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, LequieuLab.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
