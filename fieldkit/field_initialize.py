@@ -292,11 +292,11 @@ def add_gaussian(field, center, sigma, height=1):
 
         # use cutoff to marginally speed up calculation
         if dr2 < rcut2:
-            gamma = invM * height / (np.sqrt(2.0*np.pi)*a)**dim * np.exp(-0.5*dr2 / a**2) # note normalization depends on dim
+            gamma = invM * 1.0 / (np.sqrt(2.0*np.pi)*a)**dim * np.exp(-0.5*dr2 / a**2) # note normalization depends on dim
             data[index] += gamma
     
-    # scale so that sum of data == 1. This helps fix discritization errors if the full Gaussian isn't fully resolved on grid
-    data /= np.sum(data)
+    # scale so that sum of data == height. This helps fix discritization errors if the full Gaussian isn't fully resolved on grid
+    data *= height / np.sum(data)
     #print(f"{np.sum(data) = }") # should be ~1
     
     # now add to field

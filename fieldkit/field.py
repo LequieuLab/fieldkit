@@ -39,6 +39,14 @@ class Field:
             self.set_h(h)
         else: 
             self.set_h(np.eye(self.dim)) # default to identity
+
+    def hvoxel(self):
+      # TODO: remove all uses of hvoxel. I added this to support the domain analysis code
+      if self.dim == 2:
+        hvoxel = np.array([self.coords[1,0],self.coords[0,1]])
+      elif self.dim == 3:
+        hvoxel = np.array([self.coords[1,0,0],self.coords[0,1,0],self.coords[0,0,1]])
+      return hvoxel
         
     def is_orthorhombic(self):
         # sanity checks
