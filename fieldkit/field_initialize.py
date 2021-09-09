@@ -322,13 +322,15 @@ def particle_to_field_hockney_eastwood(trjfile, topfile, frame_index, npw, P):
     frame = t[frame_index] 
 
     # find number of atom types using "resSeq" variable from psf
-    # TODO: would be nice if this was more general. "resSeq" column might not work for all use cases
     table, bonds = frame.topology.to_dataframe()
+    #key = 'resSeq'
+    key = 'name' # TODO would be nice is key wasn't hardcoded. Ideally the code would try several options
     atomtypes_list = []
-    for atomtype in table['resSeq']:
+    for atomtype in table[key]:
         if not atomtype in atomtypes_list:
             atomtypes_list.append(atomtype)
     natomtypes = len(atomtypes_list)
+    print(f"Creating {natomtypes} fields for {natomtypes} found atom types")
 
     # using box size initialize new fields (one for each type
     fields = []
@@ -341,7 +343,7 @@ def particle_to_field_hockney_eastwood(trjfile, topfile, frame_index, npw, P):
     for iatom in range(frame.n_atoms):
         myP = P # all atom types currently use same sigma. Should be able to generalize...
         pos = frame.xyz[0][iatom]
-        atomtype = table.resSeq[iatom] # TODO: consider using something other than resSeq
+        atomtype = table[key][iatom] # TODO: consider using something other than resSeq
         atomtype_index = atomtypes_list.index(atomtype)
         
         add_hockney_eastwood_function(fields[atomtype_index], center=pos, P=myP, height=1)
