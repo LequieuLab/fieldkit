@@ -236,6 +236,268 @@ def add_ellipse(field, center, axis_lengths, smoothing_width = 0.05,height=1):
     # return in place 
     field.data += data_smooth
      
+def add_gaussian(field, center, sigma, height=1):
+    ''' add a gaussian to a field. 
+
+    Args: 
+        field: field to add ellipse to (edited in place)
+        units: units to use for args `center` and `sigma`. 
+               `units='real'` is default currently and `center` must fall within `h` cell tensor of field
+        center: center of Gaussian (in real units)
+        height: height of Gaussian
         
+    '''
+    npw = field.npw_Nd
+    invM = 1.0/np.prod(npw)
+    h = field.h # cell tensor
+    dim = field.dim
+    dx = np.zeros(dim)
+    a = sigma # warning: the sigma used for smearing in FTS contians an extra factor of sqrt(2)
+    rcut = 5.0*sigma
+    rcut2 = rcut*rcut
+    center = np.array(center) # recast center to array
+   
+    # box must be orthorhombic
+    assert(field.is_orthorhombic()), f"Error: h must be orthorhombic in add_gaussian function. {h}"
+    
+    boxl = np.diag(h)
+    boxh = 0.5*boxl
+
+    # check that center is within box
+    # option 1: assert that center myst be within box
+    #assert (np.all(center >= 0.0)), f"center must be within box {center}, {h}"
+    #assert (np.all(center < boxl)), f"center must be within box {center}, {h}"
+
+    # option 2: apply PBC to center
+    for idim in range(dim):
+        while center[idim] <  0.0:        center[idim] += boxl[idim]
+        while center[idim] >= boxl[idim]: center[idim] -= boxl[idim]
+
+    data = np.zeros(npw)
+    # TODO: its very inefficient to manually loop over all grid points
+    # should create a neighborlist of the relevant grid points nearby "center"
+    
+    # original (likely slow) version
+    for index in np.ndindex(npw):
+        scaled_index = index / np.array(npw)
+        rgrid = np.dot(h, scaled_index)
+
+        # Equation of gaussian: Gamma(r) = 1 / (2*pi)**1.5 / a**3 * exp(-r2 / 2 / a**2)
+        dr2 = 0
+        for idim in range(dim):
+          dx[idim] = rgrid[idim] - center[idim]
+          while dx[idim] >  boxh[idim]: dx[idim] -= boxl[idim]
+          while dx[idim] < -boxh[idim]: dx[idim] += boxl[idim]
+          dr2 += dx[idim] * dx[idim]
+
+        # use cutoff to marginally speed up calculation
+        if dr2 < rcut2:
+            gamma = invM * height / (np.sqrt(2.0*np.pi)*a)**dim * np.exp(-0.5*dr2 / a**2) # note normalization depends on dim
+            data[index] += gamma
+    
+    # scale so that sum of data == 1. This helps fix discritization errors if the full Gaussian isn't fully resolved on grid
+    data /= np.sum(data)
+    #print(f"{np.sum(data) = }") # should be ~1
+    
+    # now add to field
+    field.data += data
+
+def particle_to_field_hockney_eastwood(trjfile, topfile, frame_index, npw, P):
+    ''' Initialize a field using a the particle coordinates and Hockney/Eastwood function
+
+    Args: 
+        trjfile: trajectory file. Any file format compatable with mdtraj should work.
+        topfile: topology file. Any file format compatable with mdtraj should work.
+        frame_index: frame index to use to convert to field 
+        npw: dimension of grid for output field (note that the voxels must be approx. cubic to use current Hockney-Eastwood mapping function
+        P: order of Hockney-Eastwood assignment function (see Deserno and Holm 1998 for more details)
+    '''
+
+    # open trajectory using MD traj
+    import mdtraj as md
+    #t = md.load_lammpstrj(trjfile,top=topfile)
+    t = md.load(trjfile,top=topfile)
+
+    # find specified frame
+    frame = t[frame_index] 
+
+    # find number of atom types using "resSeq" variable from psf
+    # TODO: would be nice if this was more general. "resSeq" column might not work for all use cases
+    table, bonds = frame.topology.to_dataframe()
+    atomtypes_list = []
+    for atomtype in table['resSeq']:
+        if not atomtype in atomtypes_list:
+            atomtypes_list.append(atomtype)
+    natomtypes = len(atomtypes_list)
+
+    # using box size initialize new fields (one for each type
+    fields = []
+    assert(np.all(frame.unitcell_angles == 90.0)), "box must be orthorhombic"
+    h = np.diag(frame.unitcell_lengths[0])
+    for itype in range(natomtypes):
+      fields.append(Field(npw_Nd = npw, h=h))
+
+    # loop through all particles in frame and call add_gaussian function
+    for iatom in range(frame.n_atoms):
+        myP = P # all atom types currently use same sigma. Should be able to generalize...
+        pos = frame.xyz[0][iatom]
+        atomtype = table.resSeq[iatom] # TODO: consider using something other than resSeq
+        atomtype_index = atomtypes_list.index(atomtype)
         
+        add_hockney_eastwood_function(fields[atomtype_index], center=pos, P=myP, height=1)
         
+        # TODO: in principle it should be possible to also initialize using Gaussians
+        # however add_gaussians function currently searches over all grid points which makes it much to slow
+        #add_gaussian(field, center=pos, sigma=mysigma, height=1)
+
+    write_to_file("fields.dat",fields)
+    write_to_VTK("fields.vtk",fields)
+
+    # return field
+    return fields
+
+
+def add_hockney_eastwood_function(field,center, P, height = 1):
+    ''' add a Hockney Eastwood function of order P to field
+
+    Args: 
+        field: field to add Hockney Eastwood function to (edited in place)
+               `units='real'` is default currently and `center` must fall within `h` cell tensor of field
+        center: center of Hockney-Eastwood function (in real units). This is mapped into "index units" within function
+        height: total integral of function TODO: probably better to rename this from "height" to something else
+        
+    '''
+    npw = field.npw_Nd
+    h = field.h # cell tensor
+    dim = field.dim
+
+    center = np.array(center) # recast center to array
+
+    # box must be orthorhombic
+    assert(field.is_orthorhombic()), f"Error: h must be orthorhombic in add_gaussian function. {h}"
+    
+    # voxels must be cubic 
+    grid_spacings = np.diag(h) / npw # since field is orthorhombic, gridspacings will be of length dim
+    assert (np.allclose(grid_spacings, grid_spacings[0],atol=1e-2)), f"voxels must be cubic {grid_spacings = }"
+    
+    xparticle = center / np.diag(h) * npw # xparticle should be in range [0,npw)
+     
+    # apply PBC to xparticle
+    for idim in range(dim):
+        while xparticle[idim] <  0:         xparticle[idim] += npw[idim]
+        while xparticle[idim] >= npw[idim]: xparticle[idim] -= npw[idim]
+
+    grid_indicies, weights = hockney_eastwood_function(xparticle, npw, P)
+   
+    data = np.zeros(npw)
+    for i,index in enumerate(grid_indicies):
+        data[index] += weights[i]
+
+    # now add to field
+    field.data += data
+
+
+    
+def hockney_eastwood_function(xparticle, ngridpts, P):
+    ''' Hockney-Eastwood Function as described in Deserno and Holm 1998
+
+    Args:
+        xparticle: position of particle in each dimension. Note that xparticle is given in "index units" so that spacking between grid points is = 1
+        ngridpts: the number of grid point that make up the total grid   
+        P: order of the assignment function
+
+    Returns:
+        grid_indicies: a list of tuples (each tuple is of lengh dim) that describe the grid indicies updated by the function
+        weights: the weight of the particle corresponding to each of those grid indicies
+    '''
+
+    dim = len(xparticle)
+    assert(dim >= 1 and dim <= 3) 
+    
+    grid_indicies_per_dim = [[]]*dim # blank 2d list, len(1) == dim, len(2) == unspecified
+    weights_per_dim = np.zeros((dim,P))
+
+    for idim in range(dim): 
+
+      # set xbar
+      if ((P % 2) == 0): # P is even
+        # set xbar as midpoint of nearest two mesh points
+        if np.floor(xparticle[idim]) != np.ceil(xparticle[idim]): 
+          xbar = 0.5*(np.floor(xparticle[idim]) + np.ceil(xparticle[idim]))
+          grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))]
+          nelem = 2
+        else: # check for edge case if xparticle is exactly an integer (so floor and ceil are equal)
+          xbar = 0.5*(np.floor(xparticle[idim]) + np.ceil(xparticle[idim]) + 1) # use higher grid index, it wont matter since its weight will be ~0
+          grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))+1] # should the 2nd entry be np.floor instead?
+          nelem = 2
+      else: # P is odd
+        # set xbar as location of nearest mesh point
+        xbar = np.round(xparticle[idim])
+        grid_indicies_per_dim[idim] = [int(xbar)]
+        nelem = 1
+
+      # now find the indicies of the P closest mesh points
+      while (len(grid_indicies_per_dim[idim]) < P):
+        idx_down = grid_indicies_per_dim[idim][0] - 1
+        idx_up = grid_indicies_per_dim[idim][-1] + 1
+        grid_indicies_per_dim[idim].insert(0,idx_down) # add to beginning
+        grid_indicies_per_dim[idim].append(idx_up)     # add to end
+        nelem += 2
+     
+      grid_indicies_per_dim[idim] = np.array(grid_indicies_per_dim[idim],dtype=np.int)
+      
+      # grid_indicies should be an ascending sequence of integers
+      assert(len(grid_indicies_per_dim[idim]) == P)
+      
+      # apply PBCs (but don't change order)
+      for i in range(P):
+        while grid_indicies_per_dim[idim][i] < 0:               grid_indicies_per_dim[idim][i] += ngridpts[idim]
+        while grid_indicies_per_dim[idim][i] >= ngridpts[idim]: grid_indicies_per_dim[idim][i] -= ngridpts[idim]
+     
+      
+      # These equations are from Appendix E of Deserno and Holm
+      dx = xparticle[idim]-xbar
+      if P == 1:
+        weights_per_dim[idim][0] = 1 
+      elif P == 2:
+        weights_per_dim[idim][0] = 0.5*(1-2*dx)
+        weights_per_dim[idim][1] = 0.5*(1+2*dx)
+      elif P == 3:
+        weights_per_dim[idim][0] = 0.125*(1 - 4*dx + 4*dx*dx)
+        weights_per_dim[idim][1] = 0.25*(3 - 4*dx*dx)
+        weights_per_dim[idim][2] = 0.125*(1 + 4*dx + 4*dx*dx)
+      elif P == 4:
+        weights_per_dim[idim][0] = 1.0/48.*(1 - 6*dx + 12*dx*dx - 8*dx*dx*dx)
+        weights_per_dim[idim][1] = 1.0/48.*(23 - 30*dx - 12*dx*dx + 24*dx*dx*dx)
+        weights_per_dim[idim][2] = 1.0/48.*(23 + 30*dx - 12*dx*dx - 24*dx*dx*dx)
+        weights_per_dim[idim][3] = 1.0/48.*(1 + 6*dx + 12*dx*dx + 8*dx*dx*dx)
+      elif P == 5:
+        weights_per_dim[idim][0] = 1.0/384.*(1 - 8*dx + 24*dx*dx - 32*dx*dx*dx + 16*dx*dx*dx*dx)
+        weights_per_dim[idim][1] = 1.0/96. *(19 - 44*dx + 24*dx*dx + 16*dx*dx*dx - 16*dx*dx*dx*dx)
+        weights_per_dim[idim][2] = 1.0/192.*(115 - 120*dx*dx + 48*dx*dx*dx*dx)
+        weights_per_dim[idim][3] = 1.0/96. *(19 + 44*dx + 24*dx*dx - 16*dx*dx*dx - 16*dx*dx*dx*dx)
+        weights_per_dim[idim][4] = 1.0/384.*(1 + 8*dx + 24*dx*dx + 32*dx*dx*dx + 16*dx*dx*dx*dx)
+      else:
+        raise RuntimeError ("Invalid P")
+    
+    # noW need to find all combinations of grid_indicies and weights     
+    grid_indicies = []
+    weights = []
+    
+    # by using np.ndindex, this should work for any dimension
+    shape_Pdim = tuple([P]*dim)
+    for i_Pdim in np.ndindex(shape_Pdim):
+        index_Nd = []
+        weight = 1.0
+        for idim in range(dim):
+            index_Nd.append(grid_indicies_per_dim[idim][i_Pdim[idim]])
+            weight *= weights_per_dim[idim][i_Pdim[idim]]
+        grid_indicies.append(tuple(index_Nd))
+        weights.append(weight)
+        
+    return grid_indicies,weights
+
+
+
+
+
