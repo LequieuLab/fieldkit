@@ -1,7 +1,7 @@
 import fieldkit as fk
 from pytest import approx
 
-def test_all():
+def test_units_scaled():
     npw = (64,64)
     
     field1 = fk.Field(npw_Nd = npw)
@@ -21,3 +21,5 @@ def test_all():
     assert(approx(field2.data[63,0], 1e-02) == 1.00)
     assert(approx(field2.data[63,63], 1e-02) == 1.00)
     assert(approx(field2.data[19,12], 1e-01) == 0.022)
+
+#TODO test unscaled units

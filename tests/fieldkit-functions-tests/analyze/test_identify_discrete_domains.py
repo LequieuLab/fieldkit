@@ -15,11 +15,11 @@ def test_2d():
     fk.write_to_file("fields.dat",[field])
     
     threshold = 0.25
-    nregions, regionID = fk.identify_and_index_domains(field, threshold)
+    nregions, regionID, image_flags, domainBorder  = fk.identify_discrete_domains(field, threshold)
     assert (nregions == 3) 
 
     threshold = 0.05
-    nregions, regionID = fk.identify_and_index_domains(field, threshold)
+    nregions, regionID, image_flags, domainBorder  = fk.identify_discrete_domains(field, threshold)
     assert (nregions == 2) 
 
     field.data = regionID
@@ -38,11 +38,11 @@ def test_3d():
     fk.write_to_VTK("fields.vtk",[field])
     
     threshold = 0.1
-    nregions, regionID = fk.identify_and_index_domains(field, threshold)
+    nregions, regionID, image_flags, domainBorder  = fk.identify_discrete_domains(field, threshold)
     assert (nregions == 3) 
 
     threshold = 0.02
-    nregions, regionID = fk.identify_and_index_domains(field, threshold)
+    nregions, regionID, image_flags, domainBorder  = fk.identify_discrete_domains(field, threshold)
     assert (nregions == 2) 
 
     field.data = regionID

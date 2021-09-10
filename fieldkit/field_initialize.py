@@ -187,7 +187,7 @@ def initialize_phase(phase, npw, h):
     
     
     
-def add_ellipse(field, center, axis_lengths, smoothing_width = 0.05,height=1):
+def add_ellipse(field, center, axis_lengths, smoothing_width = 0.05,height=1,units="scaled"):
     """ adds an elipse
     
     Args:
@@ -208,18 +208,32 @@ def add_ellipse(field, center, axis_lengths, smoothing_width = 0.05,height=1):
   
     npw = field.npw_Nd
     dim = len(npw)
+    h = field.h
     assert(len(axis_lengths) == dim)
     dx = np.zeros(dim)
     data = np.zeros(npw)
+    
+    if units == "unscaled":
+      assert(field.is_orthorhombic()), f"Error: h must be orthorhombic in add_gaussian function. {h}"
+      boxl = np.diag(h)
+      boxh = 0.5*boxl
+    elif units == "scaled":
+      boxl = [1.0]*dim
+      boxh = [0.5]*dim
+
 
     for index in np.ndindex(npw):
         scaled_index = index / np.array(npw)
+        if units == "unscaled":
+            rgrid = np.dot(h, scaled_index)
+        elif units == "scaled":
+            rgrid = scaled_index
         # Equation of ellipse: x**2/a**2 + y**2/b**2 + z**2/c**2  = 1
         dist2 = 0
         for idim in range(dim):
-          dx[idim] = scaled_index[idim] - center[idim]
-          if dx[idim] > 0.5:   dx[idim] -= 1.0
-          if dx[idim] < -0.5:  dx[idim] += 1.0
+          dx[idim] = rgrid[idim] - center[idim]
+          while dx[idim] >  boxh[idim]: dx[idim] -= boxl[idim]
+          while dx[idim] < -boxh[idim]: dx[idim] += boxl[idim]
           dist2 += dx[idim]*dx[idim] / axis_lengths[idim]**2
   
         if dist2 < 1: # is inside ellipse
