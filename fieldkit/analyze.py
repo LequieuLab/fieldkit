@@ -7,12 +7,11 @@ from skimage import measure
 import sys
 sys.setrecursionlimit(800000)
 
-def calc_domain_stats_mesh(field, density_threshold, plotMesh=False,outputMesh=False,add_periodic_domains=False, applyPBC=True):
+def calc_domain_stats(field, density_threshold, plotMesh=False,outputMesh=False,add_periodic_domains=False, applyPBC=True):
     ''' calculate properties of domains using a mesh
         Adapted from domaintools.py
     '''
     
-    useMesh = True 
     dim = field.dim
     h = field.h
     
@@ -21,6 +20,7 @@ def calc_domain_stats_mesh(field, density_threshold, plotMesh=False,outputMesh=F
     com = np.zeros((ndomains, dim))
     surface_area = np.zeros(ndomains)
     volume = np.zeros(ndomains)
+    volume_nomesh = np.zeros(ndomains)
     IQ = np.zeros(ndomains)
 
     #for each domain
@@ -28,51 +28,54 @@ def calc_domain_stats_mesh(field, density_threshold, plotMesh=False,outputMesh=F
         # calc center of domain
         com[idomain,:] = _calc_domain_center(idomain+1, field, domainID, image_flags, units='coord')
         
-        if useMesh:
 
-            if dim == 2:
-                # mesh domain
-                contours,density_centered = _mesh_single_domain(field, idomain+1, density_threshold, domainID, image_flags,domainBorder, wrap_before_mesh=applyPBC)
-                assert (len(contours) == 1), "The contour should only be one curve, if not the area and volume calculations will be completely wrong!"
+        if dim == 2:
+            # mesh domain
+            contours,density_centered = _mesh_single_domain(field, idomain+1, density_threshold, domainID, image_flags,domainBorder, wrap_before_mesh=applyPBC)
+            assert (len(contours) == 1), "The contour should only be one curve, if not the area and volume calculations will be completely wrong!"
 
-                # get surface area (perimeter) and volume (area)
-                surface_area[idomain] = _contour_perimeter(contours[0])
-                volume[idomain] = _contour_area(contours[0])
+            # get surface area (perimeter) and volume (area)
+            surface_area[idomain] = _contour_perimeter(contours[0])
+            volume[idomain] = _contour_area(contours[0])
 
-                if plotMesh: 
-                    # draw surface behind the mesh
-                    self.plotContours2D(contours,filename="mesh.{}.png".format(idomain+1),surface=density_centered)
-                    # dont draw surface behind the mesh
-                    #self.plotContours2D(contours,filename="mesh.{}.png".format(idomain+1))
+            if plotMesh: 
+                # draw surface behind the mesh
+                _plot_contours_2D(field,contours,filename="mesh.{}.png".format(idomain+1),surface=density_centered)
+        if dim == 3: 
+            # mesh domain
+            verts, faces, normals, values,density_centered = _mesh_single_domain(field, idomain+1, density_threshold, domainID, image_flags,domainBorder,wrap_before_mesh=applyPBC)
 
-            if dim == 3: 
-                # mesh domain
-                verts, faces, normals, values,density_centered = _mesh_single_domain(field, idomain+1, density_threshold, domainID, image_flags,domainBorder,wrap_before_mesh=applyPBC)
+            # get surface area, volume and isoperimetric quotient
+            surface_area[idomain] = measure.mesh_surface_area(verts, faces)
+            volume[idomain] = _mesh_volume(verts,faces)
+            if plotMesh: 
+                _plot_mesh_3D(field, verts,faces, filename="mesh.{}.png".format(idomain+1))
+            if outputMesh:
+                _write_mesh(verts,faces,fileprefix="mesh.{}.".format(idomain+1))
 
-                # get surface area, volume and isoperimetric quotient
-                surface_area[idomain] = measure.mesh_surface_area(verts, faces)
-                volume[idomain] = _mesh_volume(verts,faces)
-                if plotMesh: 
-                    self.plotMesh3D(verts,faces, filename="mesh.{}.png".format(idomain+1))
-                if outputMesh:
-                    self.writeMesh(verts,faces,fileprefix="mesh.{}.".format(idomain+1))
+        IQ[idomain] = _calc_IQ(dim,surface_area[idomain], volume[idomain])
 
-            IQ[idomain] = _calc_IQ(dim,surface_area[idomain], volume[idomain])
+        # should work for 2d and 3d
+        volume_nomesh[idomain] = _voxel_volume(field, idomain+1, domainID) # get volume from voxels
+        
+        # sanity check to make sure that volume is reasonable
+        if not np.isclose(volume_nomesh[idomain], volume[idomain], rtol=0.2):
+            print(f"WARNING: the volume computed via mesh is >20% different from volume from voxels {volume[idomain]} != {volume_nomesh[idomain]}. Check the mesh to make sure the domain mesh is fully closed.")
 
-        else:
-            surface_area[idomain] = -1.0 #FIXME surface_area is currently not calculated if no mesh
-            volume[idomain] = _voxel_volume(field, idomain+1, domainID) # get volume from voxels
-            IQ[idomain] = 0.0
     if add_periodic_domains:
         for idomain in range(1,ndomains+1):  
-            extracom = self.pbc_domain_locs(idomain,com[idomain-1])
+            extracom = _pbc_domain_locs(idomain,com[idomain-1])
             if extracom:
                 com = np.concatenate((com,extracom))
                 extra_num = len(extracom)
                 IQ = np.concatenate((IQ,[IQ[idomain-1]]*extra_num)) 
                 surface_area = np.concatenate((surface_area,[surface_area[idomain-1]]*extra_num)) 
                 volume = np.concatenate((volume,[volume[idomain-1]]*extra_num)) 
-    return ndomains, com, surface_area, volume, IQ
+
+
+    stats = {'ndomains': ndomains, 'center': com, 'surface_area': surface_area, 'volume': volume, 'volume_nomesh':volume_nomesh, 'IQ':IQ}
+
+    return stats
 
 def _calc_domain_center(idomain, field, domainID, image_flags, units='box'):
     ''' given a domain index, apply PBC and return the center of mass
@@ -101,7 +104,8 @@ def _calc_domain_center(idomain, field, domainID, image_flags, units='box'):
   
            # new for non-orthorhombic boxes (check that this works for orthorhombic though!)
            #shift = np.array(np.mat(self.__hvoxel.T) * np.mat(image_flags[index] * Nx).T).T
-           shift = np.array(np.mat(h.T) * np.mat(image_flags[index]).T).T
+           #shift = np.array(np.mat(h.T) * np.mat(image_flags[index]).T).T # depreciated np.mat
+           shift = np.dot(h, image_flags[index])
            coord = field.coords[index] + shift
         else:
             raise ValueError("Invalid units entry of \'%s\'" % units)
@@ -159,7 +163,8 @@ def _mesh_single_domain(field, idomain, density_threshold, domainID, image_flags
 
         # convert 'box' units to 'coords' units (this is key for non-orthorhombic cells)
         for i,c in enumerate(contours):
-            contours[i] = np.array((np.mat(hvoxel).T * np.mat(c).T).T)
+            #contours[i] = np.array((np.mat(hvoxel).T * np.mat(c).T).T) #old depreciated use of np.mat
+            contours[i] = np.dot(c, hvoxel)
 
         return contours, alldensity
     elif dim == 3:
@@ -167,13 +172,15 @@ def _mesh_single_domain(field, idomain, density_threshold, domainID, image_flags
 
         #verts, faces, normals, values = measure.marching_cubes_lewiner(mydensity, self.__density_threshold, spacing = self.__gridspacing)
         # do not use spacing=self.__gridspacing, let marching cubes calculate verticies in 'box' units (0,Nx) 
-        verts, faces, normals, values = measure.marching_cubes_lewiner(mydensity, density_threshold)
+        verts, faces, normals, values = measure.marching_cubes(mydensity, density_threshold)
 
         # convert 'box' units to 'coords' units (this is key for non-orthorhombic cells)
         for i,v in enumerate(verts):
-            verts[i] = np.array((np.mat(hvoxel).T * np.mat(v).T).T)
+            #verts[i] = np.array((np.mat(hvoxel).T * np.mat(v).T).T) # depreciated np.mat
+            verts[i] = np.dot(hvoxel,v)
             n = normals[i]
-            normals[i] = np.array((np.mat(hvoxel).T * np.mat(n).T).T)
+            #normals[i] = np.array((np.mat(hvoxel).T * np.mat(n).T).T) # depreciated np.mat
+            normals[i] = np.dot(hvoxel,n) 
 
 
         return verts, faces, normals, values, alldensity
@@ -233,7 +240,7 @@ def _voxel_volume(field, idomain, regionID):
     ''' Get volume of idomain using voxels
     '''
     #v_voxel = np.prod(self.__gridspacing) # volume of single voxel
-    v_voxel = np.linalg.det(field.h)
+    v_voxel = np.linalg.det(field.h) / field.npw_total
     #v_voxel = self.__volvoxel
     n_voxel = np.sum(regionID == idomain) # number of voxels in ith domain
     return v_voxel*n_voxel
@@ -247,6 +254,83 @@ def _calc_IQ(dim, area, vol):
        return 4.0*np.pi*vol / (area * area)
    elif dim == 3:
        return 36.0*np.pi * vol*vol / (area * area * area)
+
+def _plot_contours_2D(field, contours, surface=None, filename=None):
+    ''' Plot a mesh from marching squares
+    '''
+    import matplotlib.pyplot as plt
+    Nx = field.npw_Nd
+    hvoxel = field.hvoxel()
+
+    # Display the image and plot all contours found
+    fig, ax = plt.subplots()
+
+    ax.set_aspect(1)
+
+    if surface is not None:
+        x = np.arange(Nx[0])
+        y = np.arange(Nx[1])
+        xx,yy = np.meshgrid(x,y)
+        
+        # nice one-liner to rotate all of xx and yy using hvoxel
+        xxrot,yyrot = np.einsum('ji, mni -> jmn', hvoxel.T, np.dstack([xx, yy]))
+        
+        # using pcolormesh allows us to use non-orthorhombic boxes 
+        im=ax.pcolormesh(xxrot,yyrot,surface.T,shading='auto')
+        fig.colorbar(im,ax=ax)
+        
+        # imshow only worked for orthorhombic boxes
+        #ax.imshow(surface.T, interpolation='nearest')
+
+    for n, contour in enumerate(contours):
+        ax.plot(contour[:, 0], contour[:, 1], linewidth=2, color='k',ls='--',marker='o')
+
+    #ax.axis('image')
+    #ax.set_xticks([])
+    #ax.set_yticks([])
+    if not filename:
+        plt.show()
+    else:
+        plt.savefig(filename)
+    plt.close()
+
+def _plot_mesh_3D(field, verts, faces, filename=None):
+    ''' Plot a mesh from marching cubes
+    '''
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+    assert(field.is_orthorhombic())
+    assert(field.dim == 3)
+    boxl = np.diag(field.h)
+
+    # Display resulting triangular mesh using Matplotlib. This can also be done
+    # with mayavi (see skimage.measure.marching_cubes_lewiner docstring).
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Fancy indexing: `verts[faces]` to generate a collection of triangles
+    mesh = Poly3DCollection(verts[faces])
+    mesh.set_edgecolor('k')
+    ax.add_collection3d(mesh)
+
+    ax.set_xlim(0, boxl[0])  
+    ax.set_ylim(0, boxl[1])  
+    ax.set_zlim(0, boxl[2])  
+
+    plt.tight_layout()
+    if not filename:
+        plt.show()
+    else:
+        plt.savefig(filename)
+
+    plt.close()
+
+def _write_Mesh(verts,faces,fileprefix="mesh."):
+   '''save mesh to a file'''
+   np.savetxt(fileprefix + "verts.dat",verts,header='Autogenerated mesh file. Contains x y z positions of each vertex' )
+   np.savetxt(fileprefix + "faces.dat",faces, header='Autogenerated mesh file. Contains vertex indicies of each triangle in mesh')
+    
 
 
  
@@ -358,9 +442,6 @@ def _get_neighbors(coord_center,center_image_flag, Nx):
         2) the image_flag (which PBC) that neighbor corresponds to
    '''
    dim = len(coord_center)
-   # set default
-   if center_image_flag == []:
-        center_image_flag = np.zeros(dim)
 
    neighbors = [];
    neigh_image_flags = np.tile(center_image_flag, (2*dim,1))
@@ -423,7 +504,7 @@ def _pbc_domain_locs(field, idomain,regionID, image_flags, local_com):
         #find the location of the extra periodic com by adding the box length times the flag to the current com 
 
         # new - without assuming orthorhombic box
-        shift = np.array(np.mat(hvoxel.T) * np.mat(flag * Nx).T).T
+        shift = np.array(hvoxel.T * (flag * Nx).T).T
         shift = np.reshape(shift,(dim,))
         new_com = local_com - shift #note minus shift to follow trentons convention
 
