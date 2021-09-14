@@ -25,6 +25,7 @@ Welcome to fieldkit's documentation!
 
    manipulate_fields
    visualize
+   add_ellipse
 
 .. toctree::
    :maxdepth: 2

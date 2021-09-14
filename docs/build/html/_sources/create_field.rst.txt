@@ -30,4 +30,9 @@ Uses all three functions from above to create a Field object from density.dat an
    fk.write_to_file("tmp.dat", fields)
    fk.write_to_VTK("density.vtk", fields)
 
+**Output**
 
+..  image:: example_read_output.png
+   :width: 800
+
+density.vtk (left) and tmp.dat(right) are the putput files of write_to_VTK and write_to_file functions, respeictively

@@ -170,22 +170,24 @@
 <h1>Visualizing Fields<a class="headerlink" href="#visualizing-fields" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="d-field-using-matplotlib-or-gnuplot">
 <h2>1D Field Using matplotlib or gnuplot<a class="headerlink" href="#d-field-using-matplotlib-or-gnuplot" title="Permalink to this headline">¶</a></h2>
-<p><strong>matplotlib example</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;density_1D.dat&quot;</span>
-<span class="n">fields</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">read_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<span class="n">newfields</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">replicate_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-
-<span class="c1">#very basic plotting</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">newfields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">newfields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<dl>
+<dt><strong>matplotlib example</strong>::</dt><dd><p>import matplotlib.pyplot as plt</p>
+<p>filename = “density_1D.dat”
+fields = fk.read_from_file(filename)
+newfields = fk.replicate_fields(fields, 3)</p>
+<p>#very basic plotting
+plt.figure
+plt.plot(newfields[0].coords, newfields[0].data)
+plt.show()</p>
+</dd>
+</dl>
+<a class="reference internal image-reference" href="_images/matplotlib.png"><img alt="_images/matplotlib.png" src="_images/matplotlib.png" style="width: 800px;" /></a>
 <p><strong>gnuplot example</strong></p>
 <p>On Terminal (Linux): gnuplot</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="s1">&#39;./density_1D.dat&#39;</span> <span class="n">u</span> <span class="mi">1</span><span class="p">:</span><span class="mi">2</span>
 </pre></div>
 </div>
+<a class="reference internal image-reference" href="_images/gnuplot.png"><img alt="_images/gnuplot.png" src="_images/gnuplot.png" style="width: 800px;" /></a>
 <p><strong>Note:</strong> 1:2 means plotting column 1 and column 2</p>
 </div>
 <div class="section" id="d-3d-fields-using-paraview">
@@ -193,11 +195,13 @@
 <p><strong>For 2D plots</strong></p>
 <p>Using density.vtk as an example. First, change the current directory to the same directory density.vtk is in.</p>
 <p>On Terminal: paraview density.vtk</p>
-<p>On Paraview: Click “Apply” and change Representation to “Surface”
-For 3D plots</p>
+<p>On Paraview: Click “Apply” and change Representation to “Surface”</p>
+<a class="reference internal image-reference" href="_images/visualize1.png"><img alt="_images/visualize1.png" src="_images/visualize1.png" style="width: 800px;" /></a>
+<p>For 3D plots</p>
 <p>Using A15.vtk as an example. First, change the current directory to the same directory A15.vtk is in.</p>
 <p>On Terminal: paraview A15.vtk</p>
 <p>On Paraview: Click “Apply” and change Representation to “Volume”</p>
+<a class="reference internal image-reference" href="_images/visualize2.png"><img alt="_images/visualize2.png" src="_images/visualize2.png" style="width: 800px;" /></a>
 </div>
 </div>
 

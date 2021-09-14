@@ -89,6 +89,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../manipulate_fields.html">Manipulating Fields</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../visualize.html">Visualizing Fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_ellipse.html">Adding an Ellipse to an existing field</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Module</span></p>
 <ul>
@@ -167,7 +168,7 @@
 <span class="kn">from</span> <span class="nn">.field</span> <span class="kn">import</span> <span class="o">*</span>
 
 
-<div class="viewcode-block" id="read_from_file"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field_io.read_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span> 
+<div class="viewcode-block" id="read_from_file"><a class="viewcode-back" href="../../create_field.html#fieldkit.field_io.read_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span> 
   <span class="sd">&quot;&quot;&quot; Reads from textfile and output a list of Field objects.</span>
 <span class="sd">  Adapted from iotools.py.</span>
 <span class="sd">  </span>
@@ -246,7 +247,7 @@
 
   <span class="k">return</span> <span class="n">field_list</span></div>
 
-<div class="viewcode-block" id="write_to_file"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field_io.write_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span> 
+<div class="viewcode-block" id="write_to_file"><a class="viewcode-back" href="../../create_field.html#fieldkit.field_io.write_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span> 
   <span class="sd">&quot;&quot;&quot; Creates a text file based on the fields variable.</span>
 <span class="sd">  Adapted from iotools.py.</span>
 <span class="sd">  </span>
@@ -370,7 +371,7 @@
     <span class="k">return</span> <span class="n">idx</span></div>
 
   
-<div class="viewcode-block" id="write_to_VTK"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field_io.write_to_VTK">[docs]</a><span class="k">def</span> <span class="nf">write_to_VTK</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+<div class="viewcode-block" id="write_to_VTK"><a class="viewcode-back" href="../../create_field.html#fieldkit.field_io.write_to_VTK">[docs]</a><span class="k">def</span> <span class="nf">write_to_VTK</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Creates a VTK file based on the fields variable.</span>
 <span class="sd">    Adapted from FTS-tools/plot/PolyFTS_to_VTK.py.</span>
 

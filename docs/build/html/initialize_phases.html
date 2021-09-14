@@ -86,13 +86,14 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with fieldkit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create_field.html">Creating a Field</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Initializing 3D Phases with 2 or 3 species</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Additional References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="manipulate_fields.html">Manipulating Fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualize.html">Visualizing Fields</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Module</span></p>
 <ul>
@@ -167,32 +168,6 @@
   <div class="section" id="module-fieldkit.field_initialize">
 <span id="initializing-3d-phases-with-2-or-3-species"></span><h1>Initializing 3D Phases with 2 or 3 species<a class="headerlink" href="#module-fieldkit.field_initialize" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="fieldkit.field_initialize.add_ellipse">
-<code class="sig-prename descclassname">fieldkit.field_initialize.</code><code class="sig-name descname">add_ellipse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">center</span></em>, <em class="sig-param"><span class="n">axis_lengths</span></em>, <em class="sig-param"><span class="n">smoothing_width</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">height</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fieldkit/field_initialize.html#add_ellipse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fieldkit.field_initialize.add_ellipse" title="Permalink to this definition">¶</a></dt>
-<dd><p>adds an elipse</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>field</strong> – field to add ellipse to (edited in place)</p></li>
-<li><p><strong>center</strong> – center of ellipse (in scaled [0-1])</p></li>
-<li><p><strong>axis_lengths</strong> – lengths of ellipse axis in each dimension (in scaled [0-1])</p></li>
-<li><p><strong>smoothing_width</strong> – sigma to use for smoothing gaussian filter</p></li>
-<li><p><strong>height</strong> – height of ellipse</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>field edited in place</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>field</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>None currently.</strong> – </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="fieldkit.field_initialize.initialize_phase">
 <code class="sig-prename descclassname">fieldkit.field_initialize.</code><code class="sig-name descname">initialize_phase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phase</span></em>, <em class="sig-param"><span class="n">npw</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fieldkit/field_initialize.html#initialize_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fieldkit.field_initialize.initialize_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a list of Field objects for 3D phases with 2 or 3 species.</p>
@@ -220,8 +195,8 @@
 </dl>
 </dd></dl>
 
-<div class="section" id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>The following example outputs vtk files for Field objects created by the initialize_phase function.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -229,36 +204,18 @@
 <span class="n">npw</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
-<span class="n">new_field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">initialize_phase</span><span class="p">(</span><span class="s2">&quot;A15&quot;</span><span class="p">,</span> <span class="n">npw</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">write_to_VTK</span><span class="p">(</span><span class="s2">&quot;A15.vtk&quot;</span><span class="p">,</span> <span class="n">new_field</span><span class="p">)</span>
+<span class="n">field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">initialize_phase</span><span class="p">(</span><span class="s2">&quot;A15&quot;</span><span class="p">,</span> <span class="n">npw</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">write_to_VTK</span><span class="p">(</span><span class="s2">&quot;A15.vtk&quot;</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
 
 <span class="n">new_field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">initialize_phase</span><span class="p">(</span><span class="s2">&quot;alt-C15&quot;</span><span class="p">,</span> <span class="n">npw</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">write_to_VTK</span><span class="p">(</span><span class="s2">&quot;alt-C15.vtk&quot;</span><span class="p">,</span> <span class="n">new_field</span><span class="p">)</span><span class="n">a</span>
+<span class="n">fk</span><span class="o">.</span><span class="n">write_to_VTK</span><span class="p">(</span><span class="s2">&quot;alt-C15.vtk&quot;</span><span class="p">,</span> <span class="n">new_field</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This examples shows how to add one of more ellipses in 1D/2D.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#1d</span>
-<span class="n">npw</span> <span class="o">=</span> <span class="p">[</span><span class="mi">64</span><span class="p">]</span>
-<span class="n">field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">npw_Nd</span><span class="o">=</span><span class="n">npw</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">[</span><span class="mf">0.25</span><span class="p">])</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;fields.in&quot;</span><span class="p">,[</span><span class="n">field</span><span class="p">])</span>
-
-<span class="c1">#2d</span>
-<span class="n">npw</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">64</span><span class="p">)</span>
-<span class="n">field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">npw_Nd</span><span class="o">=</span><span class="n">npw</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span><span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;fields.in&quot;</span><span class="p">,[</span><span class="n">field</span><span class="p">])</span>
-
-<span class="c1"># 2d multiple ellipse</span>
-<span class="n">npw</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">64</span><span class="p">)</span>
-<span class="n">field</span> <span class="o">=</span> <span class="n">fk</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">npw_Nd</span><span class="o">=</span><span class="n">npw</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.2</span><span class="p">),</span><span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span><span class="n">height</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">smoothing_width</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">add_ellipse</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">axis_lengths</span><span class="o">=</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.05</span><span class="p">),</span><span class="n">height</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">smoothing_width</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
-<span class="n">fk</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;fields.in&quot;</span><span class="p">,[</span><span class="n">field</span><span class="p">])</span>
-</pre></div>
-</div>
+<p><strong>OUTPUT</strong></p>
+<a class="reference internal image-reference" href="_images/A15.0000.png"><img alt="_images/A15.0000.png" src="_images/A15.0000.png" style="width: 600px;" /></a>
+<p>Data from A15.vtk plotted in Paraview</p>
+<a class="reference internal image-reference" href="_images/alt-C15.0000.png"><img alt="_images/alt-C15.0000.png" src="_images/alt-C15.0000.png" style="width: 600px;" /></a>
+<p>Data from alt-C15.vtk plotted in Paraview</p>
 </div>
 </div>
 

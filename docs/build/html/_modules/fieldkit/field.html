@@ -89,6 +89,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../manipulate_fields.html">Manipulating Fields</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../visualize.html">Visualizing Fields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../add_ellipse.html">Adding an Ellipse to an existing field</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Module</span></p>
 <ul>
@@ -161,7 +162,7 @@
   <h1>Source code for fieldkit.field</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
+<div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../create_field.html#fieldkit.field.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; Class for Field object used to model 1D, 2D, 3D structures.</span>
 <span class="sd">    </span>
 <span class="sd">    Attributes:</span>
@@ -203,7 +204,7 @@
         
 
 
-<div class="viewcode-block" id="Field.set_h"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field.Field.set_h">[docs]</a>    <span class="k">def</span> <span class="nf">set_h</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">h</span><span class="p">):</span>
+<div class="viewcode-block" id="Field.set_h"><a class="viewcode-back" href="../../create_field.html#fieldkit.field.Field.set_h">[docs]</a>    <span class="k">def</span> <span class="nf">set_h</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">h</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Checks that h is square and sets coords. &quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="n">h</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">shape</span><span class="p">)):</span>
@@ -213,7 +214,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CoordsFromH</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Field.set_data"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field.Field.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="Field.set_data"><a class="viewcode-back" href="../../create_field.html#fieldkit.field.Field.set_data">[docs]</a>    <span class="k">def</span> <span class="nf">set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets data based on size.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">npw_total</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># if already init with size, check that size matches</span>
@@ -230,7 +231,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span></div>
 
    
-<div class="viewcode-block" id="Field.CoordsFromH"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field.Field.CoordsFromH">[docs]</a>    <span class="k">def</span> <span class="nf">CoordsFromH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Field.CoordsFromH"><a class="viewcode-back" href="../../create_field.html#fieldkit.field.Field.CoordsFromH">[docs]</a>    <span class="k">def</span> <span class="nf">CoordsFromH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute coordinates of field from current &quot;h&quot; box vector.&quot;&quot;&quot;</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npw_Nd</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npw_Nd</span><span class="p">):</span>
@@ -239,7 +240,7 @@
             <span class="n">coords</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
         <span class="k">return</span> <span class="n">coords</span><span class="p">;</span></div>
 
-<div class="viewcode-block" id="Field.set_coords"><a class="viewcode-back" href="../../fieldkit.html#fieldkit.field.Field.set_coords">[docs]</a>    <span class="k">def</span> <span class="nf">set_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+<div class="viewcode-block" id="Field.set_coords"><a class="viewcode-back" href="../../create_field.html#fieldkit.field.Field.set_coords">[docs]</a>    <span class="k">def</span> <span class="nf">set_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;User can manually set coords.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span></div></div>
 
