@@ -20,12 +20,13 @@ Welcome to fieldkit's documentation!
    initialize_phases
 
 .. toctree::
-   :maxdepth: 2
    :caption: Additional References
 
-   manipulate_fields
    visualize
    add_ellipse
+   change_resolution
+   rep_field
+   roll
 
 .. toctree::
    :maxdepth: 2

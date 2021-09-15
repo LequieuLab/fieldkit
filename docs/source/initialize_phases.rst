@@ -23,7 +23,7 @@ The following example outputs vtk files for Field objects created by the initial
    new_field = fk.initialize_phase("alt-C15", npw, h)
    fk.write_to_VTK("alt-C15.vtk", new_field)
 
-**OUTPUT**
+**Output**
 
 ..  image:: A15.0000.png
    :width: 600
