@@ -5,6 +5,7 @@ Initializing 3D Phases with 2 or 3 species
    :members: initialize_phase
    :undoc-members:
    :show-inheritance:
+   :noindex:
 
 Example
 -------

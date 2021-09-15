@@ -125,8 +125,8 @@ def initialize_phase(phase, npw, h):
     
     Args:
         phase: name of the phase (see description above for phases implemented in this function)
-        npw = number of grid points for each dimension
-        h = a cell tensor, in which the columns are box vectors that describe the coordinate system
+        npw: number of grid points for each dimension
+        h: a cell tensor, in which the columns are box vectors that describe the coordinate system
     
     Returns:
         field_list: list of Field objects, each object for each species.

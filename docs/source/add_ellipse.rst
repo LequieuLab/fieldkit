@@ -5,6 +5,7 @@ Adding an ellipse to an existing field
    :members: add_ellipse
    :undoc-members:
    :show-inheritance:
+   :noindex:
 
 
 Example

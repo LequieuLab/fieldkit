@@ -5,6 +5,7 @@ Changing the resolution of a field
    :members: change_resolution
    :undoc-members:
    :show-inheritance:
+   :noindex:
 
 Example
 -------

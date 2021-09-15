@@ -8,6 +8,7 @@ Field class
    :members:
    :undoc-members:
    :show-inheritance:
+   :noindex:
 
 Reading and Writing Functions
 -----------------------------
@@ -17,6 +18,7 @@ All functions are found in field_io.py
    :members: read_from_file, write_to_file, write_to_VTK
    :undoc-members:
    :show-inheritance:
+   :noindex:
 
 Example
 -------

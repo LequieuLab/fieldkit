@@ -5,6 +5,7 @@ from .field import *
 
 def change_resolution(fields_old,resolution_new):
   """For a list of Field objects, change the resolution of each Field object.
+
     Args:
         field_old: a list of Field objects
         resolution_new: a tuple that defines the new resolution of each Field object.
@@ -70,7 +71,7 @@ def replicate_fields(fields, nreplicates):
     
     Args:
         fields: a list of Field objects
-        nreplicated: number of replicates
+        nreplicates: number of replicates
 
     Returns: 
         fields_list: a list of Field objects, in which each Field object is replicated by nreplicates amount of times. 
@@ -105,6 +106,7 @@ def replicate_fields(fields, nreplicates):
         
 def roll(fields, shift):
     """ roll the fields across the PBC using shift
+
     Args:
         fields: a list of Field objects
         shift: list of length dim. How much to roll the fields. In range [0-1].

@@ -5,6 +5,7 @@ Rolling a field
    :members: roll
    :undoc-members:
    :show-inheritance:
+   :noindex:
 
 Example
 -------
