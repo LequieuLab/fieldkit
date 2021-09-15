@@ -29,6 +29,7 @@ This examples shows how to add one of more ellipses in 1D/2D.::
    fk.write_to_VTK("field_multi_ellipse.vtk",[field])
 
 **Output**
+
 From the example code above, three VTK files are outputted and plotted below in Paraview - field.vtk (left), field_one_ellipse (middle), and field_multi_ellipse.vtk (right).
 
 ..  image:: field_no_ellipse.png

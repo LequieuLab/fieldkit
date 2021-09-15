@@ -1,5 +1,5 @@
-Replicating field
-=================
+Replicating Fields
+==================
 
 .. automodule:: fieldkit.field_manip
    :members: replicate_fields

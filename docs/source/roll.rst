@@ -1,4 +1,4 @@
-Rolling a field
+Rolling Fields
 ==================================
 
 .. automodule:: fieldkit.field_manip
@@ -19,6 +19,7 @@ Example
    fk.write_to_VTK("fields_roll.vtk",fields_new)
 
 **Output**
+
 Before using the roll function (left) and after using the roll function (right)
 
 ..  image:: field_before_roll.png
