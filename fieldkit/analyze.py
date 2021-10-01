@@ -134,8 +134,8 @@ def _mesh_single_domain(field, idomain, density_threshold, domainID, image_flags
     isborder = np.zeros(Nx,dtype=np.bool)
     # convert to tuple to correctly set indicies of isborder
     isborder[tuple(domainBorder[idomain-1])] = True
-    
-    alldensity = field.data
+   
+    alldensity = field.data.real # WARNING only taking real
 
     # center box and properties around center of mass (so that domains don't cross pbc)
     # np.roll is the key function here
@@ -355,7 +355,7 @@ def identify_discrete_domains(field, density_threshold):
         imageflags: imageflags in each dimension
     '''
 
-    isdomain_array = field.data > density_threshold 
+    isdomain_array = field.data.real > density_threshold  # WARNING: only taking real
 
     Nx = field.npw_Nd
     dim = field.dim
