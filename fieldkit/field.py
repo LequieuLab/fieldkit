@@ -39,8 +39,30 @@ class Field:
             self.set_h(h)
         else: 
             self.set_h(np.eye(self.dim)) # default to identity
-        
 
+    def hvoxel(self):
+      # TODO: remove all uses of hvoxel. I added this to support the domain analysis code
+      if self.dim == 2:
+        hvoxel = np.array([self.coords[1,0],self.coords[0,1]])
+      elif self.dim == 3:
+        hvoxel = np.array([self.coords[1,0,0],self.coords[0,1,0],self.coords[0,0,1]])
+      return hvoxel
+        
+    def is_orthorhombic(self):
+        # sanity checks
+        #assert(self.h != None), "Calling is_orthorhombic but h is not initialized"
+        assert(not np.all(self.h == 0)), f"Calling is_orthorhombic but h is all zeros. {h}"
+
+        # check that upper and lower diag are zero
+        diag = np.diag(np.diag(self.h)) # this is a 2d matrix with all offdiag = 0
+        nondiag = self.h - diag # 2d matrix with diagonal elements = 0
+         
+        zero_nondiag = np.all(nondiag ==0.0)
+        if zero_nondiag:
+            return True 
+        else:
+            return False
+        
 
     def set_h(self,h):
         """ Checks that h is square and sets coords. """
