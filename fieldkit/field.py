@@ -71,8 +71,10 @@ class Field:
             assert(h.shape[i] == self.dim)
         self.h = h 
         
-        if not np.all(self.coords != None):
-            self.coords = self.CoordsFromH()
+        # if set_h is called, update coords 
+        self.coords = self.CoordsFromH()
+        #if not np.all(self.coords != None):
+        #    self.coords = self.CoordsFromH()
 
     def set_data(self,data):
         """Sets data based on size."""
