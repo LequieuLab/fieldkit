@@ -25,7 +25,7 @@ def change_resolution(fields_old,resolution_new):
     data_old = field_old.data
     data_old_k = np.fft.fftn(data_old)
 
-    data_new_k = np.zeros(npw_new,dtype=np.complex) 
+    data_new_k = np.zeros(npw_new,dtype=complex) 
 
     # create map
     for kindex_old in np.ndindex(npw_old):
@@ -44,7 +44,7 @@ def change_resolution(fields_old,resolution_new):
       else: 
         # convert kprime (unaliased) to kindex (std FFT ordering)
         kprime_new = kprime_old
-        kindex_new = np.zeros(dim,dtype=np.int)
+        kindex_new = np.zeros(dim,dtype=np.int64)
         for i,k in enumerate(kprime_new):
           if k >= 0:
             kindex_new[i] = k

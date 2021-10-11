@@ -59,7 +59,7 @@ def read_from_file(filename):
   # if complex, combine columns into complex-valued data
   if complexdata:
     assert(2*nfields == fields_flat.shape[1])
-    tmp = np.zeros((M,nfields),dtype=np.complex)
+    tmp = np.zeros((M,nfields),dtype=complex)
     for ifield in range(nfields):
       tmp[:,ifield].real = fields_flat[:,2*ifield]
       tmp[:,ifield].imag = fields_flat[:,2*ifield + 1]
@@ -123,7 +123,7 @@ def write_to_file(filename, fields):
   coords = fields[0].coords
   assert(fields[0].is_real_space), "Can only currently write real space fields"
   is_real_space = True
-  if fields[0].data.dtype == np.complex:
+  if fields[0].data.dtype == complex:
     complexdata = True
   else:
     complexdata = False

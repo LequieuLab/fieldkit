@@ -3,11 +3,11 @@
 
 name: Integration tests on fieldkit functions with pytest
 
-on:
-  push:
-    branches: [ master, fieldkit-tests ]
-  pull_request:
-    branches: [ master, fieldkit-tests ]
+on: [ push, pull_request]
+  #push:
+  #  branches: [ master ]
+  #pull_request:
+  #  branches: [ master ]
 
 jobs:
   build:
@@ -30,6 +30,7 @@ jobs:
         python -m pip install pytest
         python -m pip install numpy
         python -m pip install scipy
+        python -m pip install mdtraj
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
       env: 

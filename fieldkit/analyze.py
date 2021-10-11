@@ -131,7 +131,7 @@ def _mesh_single_domain(field, idomain, density_threshold, domainID, image_flags
     
     isdomain = (domainID == idomain)
     #isborder = (self.__borderID == idomain)
-    isborder = np.zeros(Nx,dtype=np.bool)
+    isborder = np.zeros(Nx,dtype=bool)
     # convert to tuple to correctly set indicies of isborder
     isborder[tuple(domainBorder[idomain-1])] = True
    

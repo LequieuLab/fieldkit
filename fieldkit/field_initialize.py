@@ -485,7 +485,7 @@ def hockney_eastwood_function(xparticle, ngridpts, P):
         grid_indicies_per_dim[idim].append(idx_up)     # add to end
         nelem += 2
      
-      grid_indicies_per_dim[idim] = np.array(grid_indicies_per_dim[idim],dtype=np.int)
+      grid_indicies_per_dim[idim] = np.array(grid_indicies_per_dim[idim],dtype=np.int64)
       
       # grid_indicies should be an ascending sequence of integers
       assert(len(grid_indicies_per_dim[idim]) == P)
