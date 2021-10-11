@@ -145,7 +145,7 @@ def write_to_file(filename, fields):
   if dim == 1:
     fout.write("# Columns: x fielddata\n")
     for ix in range(0,npw[0]):
-      fout.write("%16.10g " % coords[ix][0])
+      fout.write("%12.10g " % coords[ix][0])
       for n in range(nfields):
         if complexdata:
           fout.write("%16.10g " % fields[n].data[ix].real)
@@ -158,7 +158,7 @@ def write_to_file(filename, fields):
     fout.write("# Columns: x y fielddata\n")
     for ix in range(0,npw[0]):
       for iy in range(0,npw[1]):
-        fout.write("%7.4f %7.4f " % (coords[ix,iy,0], coords[ix,iy,1]))
+        fout.write("%12.10g %12.10g " % (coords[ix,iy,0], coords[ix,iy,1]))
         for n in range(nfields):
           if complexdata:
             fout.write("%16.10g " % (fields[n].data[ix,iy].real))
@@ -173,7 +173,7 @@ def write_to_file(filename, fields):
     for ix in range(0,npw[0]):
       for iy in range(0,npw[1]):
         for iz in range(0,npw[2]):
-          fout.write("%7.4f %7.4f %7.4f" % (coords[ix,iy,iz,0], coords[ix,iy,iz,1],coords[ix,iy,iz,2]))
+          fout.write("%12.10g %12.10g %12.10g" % (coords[ix,iy,iz,0], coords[ix,iy,iz,1],coords[ix,iy,iz,2]))
           for n in range(nfields):
             if complexdata:
               fout.write("%16.10g " % (fields[n].data[ix,iy,iz].real))
@@ -223,8 +223,8 @@ def write_to_VTK(filename, fields):
    """
    
     #Check if vtk file is already in current directory
-    if os.path.isfile(filename):
-        print("File '{}' already exist, file will be overwritten".format(filename))
+    #if os.path.isfile(filename):
+    #    print("File '{}' already exist, file will be overwritten".format(filename))
     
     
     #Check if fields in Field object are compatible for VTK
