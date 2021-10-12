@@ -135,5 +135,43 @@ def roll(fields, shift):
     return fields_new 
 
 
+def expand_dimension(fields, dim_new, npw_new, boxl_new):
 
+    assert(type(dim_new) == int), "dim_new must be int"
+
+    # convert to lists if needed
+    if type(npw_new) == int: npw_new = [npw_new]
+    if type(boxl_new) == int: boxl_new = [boxl_new]
+    if type(fields) == Field: field = [fields]
+
+    fields_new = []
+    for field in fields:
+      dim = field.dim
+      assert(dim_new <= 3), "new dimension must be <= 3"
+      assert(dim <= dim_new), "old dimension must be < new_dim"
+      assert(len(boxl_new) == dim_new - dim), "boxl_new needed for each new dimension"
+      assert(len(npw_new) == dim_new - dim), "boxl_new needed for each new dimension"
+      assert(field.is_orthorhombic()), "field must be orthorhombic"
+   
+      nexpand = dim_new - dim
+      npw = list(field.npw_Nd) 
+      boxl = list(np.diag(field.h))
+      for i in range(nexpand) :
+        npw.append(npw_new[i])
+        boxl.append(boxl_new[i])
+      h = np.diag(boxl)
+
+      if nexpand == 1:
+        if dim_new == 2:
+          data = np.tile(field.data,(npw_new[0],1)).T
+        if dim_new == 3:
+          data = np.tile(field.data,(npw_new[0], 1 ,1)).T
+      if nexpand == 2:
+        assert(dim_new == 3 and dim == 1), "only way to expand by 2 is from 1d to 3d"
+        data = np.tile(field.data,(npw_new[1], npw_new[0] ,1)).T
+
+      #print(f"{npw = }, {h = } {data.shape = }")
+      fields_new.append(Field(npw_Nd=npw, h=h, data=data))
+
+    return fields_new
 
