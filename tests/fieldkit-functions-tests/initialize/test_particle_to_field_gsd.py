@@ -6,13 +6,12 @@ def test_hockney_eastwood_3d():
     #npw = (32,32,32)
     npw = (16,16,16)
     
-    trjfile = "./initialize/micelle.lammpstrj"
-    psffile = "./initialize/micelle.psf"
-    #rjfile = "./initialize/lam.lammpstrj"
-    #sffile = "./initialize/lam.psf"
+    gsdfile = "./initialize/micelle.gsd"
+    #trjfile = "./initialize/lam.lammpstrj"
+    #psffile = "./initialize/lam.psf"
     frame_index = -1 # use last frame
     P = 2
-    fields = fk.particle_to_field(trjfile,psffile, frame_index, npw, P)
+    fields = fk.particle_to_field_gsd(gsdfile, frame_index, npw, P, normalize=True)
 
     fk.write_to_VTK("fields.vtk",fields)
     

@@ -317,7 +317,7 @@ def add_gaussian(field, center, sigma, height=1):
     field.data += data
 
 
-def particle_to_field_hockney_eastwood(trjfile, topfile, frames_to_average, npw, P):
+def particle_to_field(trjfile, topfile, frames_to_average, npw, P):
     ''' Initialize a field using a the particle coordinates and Hockney/Eastwood function
 
     Args: 
@@ -349,13 +349,15 @@ def particle_to_field_hockney_eastwood(trjfile, topfile, frames_to_average, npw,
         if not atomtype in atomtypes_list:
             atomtypes_list.append(atomtype)
     natomtypes = len(atomtypes_list)
-    h = np.diag(frame.unitcell_lengths[0]) # cell size of first frame
+    boxl = frame.unitcell_lengths[0]
+    h = np.diag(boxl) # cell size of first frame
 
     # perform some checks over the frames
     for i in range(1,nframes_to_average):
       frame_index = frames_to_average[i]
       frame = t[frame_index] 
-      h_tmp = np.diag(frame.unitcell_lengths[0])
+      boxl_tmp = frame.unitcell_lengths[0]
+      h_tmp = np.diag(boxl_tmp)
       assert(np.all(h_tmp == h)),f"cell size must be constant across all frames used in averaging {h} {h_tmp}"
       assert(np.all(frame.unitcell_angles == 90.0)), "box must be orthorhombic"
 
@@ -366,7 +368,7 @@ def particle_to_field_hockney_eastwood(trjfile, topfile, frames_to_average, npw,
       fields.append(Field(npw_Nd = npw, h=h))
 
     for frame_index in frames_to_average:
-      print(f"Processing frame {frame_index}")
+      print(f"Processing frame {frame_index} containing {frame.n_atoms} atoms")
       # find specified frame
       frame = t[frame_index] 
 
@@ -397,6 +399,90 @@ def particle_to_field_hockney_eastwood(trjfile, topfile, frames_to_average, npw,
     # return field
     return fields
 
+def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False):
+    ''' Initialize a field using a the particle coordinates and Hockney/Eastwood function
+
+    Args: 
+        gsdfile: trajectory file in gsd format 
+        frames_to_average: frame indicies to average over when converting to field. list, or int (if single frame)
+        npw: dimension of grid for output field (note that the voxels must be approx. cubic to use current Hockney-Eastwood mapping function
+        P: order of Hockney-Eastwood assignment function (see Deserno and Holm 1998 for more details)
+        normalize: whether or not to normalize densities by rho0
+    '''
+
+    # open trajectory using gsd
+    import gsd.hoomd
+    t = gsd.hoomd.open(gsdfile,'rb')
+    
+    # if only a single frame is specified, turn it into a list
+    if type(frames_to_average) == int:
+      frames_to_average = [frames_to_average]
+    nframes_to_average = len(frames_to_average)
+  
+    # extract useful parameters from first frame (e.g. atomtypes, cell size, etc)
+    # WARNING: assumes that all atom types are present in 1st frame
+    frame = t[frames_to_average[0]]
+
+    atomtypes_list = frame.particles.types
+    natomtypes = len(atomtypes_list)
+    boxl = frame.configuration.box[0:3]
+    h = np.diag(boxl) # cell size of first frame
+    assert(np.all(frame.configuration.box[3:] == 0)), "Cell must be orthorhombic"
+    dim = frame.configuration.dimensions 
+    natoms = frame.particles.N
+    V = np.linalg.det(h)
+    rho0 = natoms / V
+    
+    # perform some checks over the frames
+    for i in range(1,nframes_to_average):
+      frame_index = frames_to_average[i]
+      frame = t[frame_index] 
+      natoms_tmp = frame.particles.N
+      boxl_tmp = frame.configuration.box[0:3]
+      h_tmp = np.diag(boxl_tmp)
+      assert(natoms_tmp == natoms),f"natoms must be constant across all frames used in averaging {natoms} {natoms_tmp}"
+      assert(np.all(h_tmp == h)),f"cell size must be constant across all frames used in averaging {h} {h_tmp}"
+      assert(np.all(frame.configuration.box[3:] == 0.0)), "box must be orthorhombic"
+
+    # using box size, initialize new fields (one for each type of atom)
+    print(f"Creating {natomtypes} fields for {natomtypes} found atom types")
+    fields = []
+    for itype in range(natomtypes):
+      fields.append(Field(npw_Nd = npw, h=h))
+
+    for frame_index in frames_to_average:
+      print(f"Processing frame {frame_index} containing {frame.particles.N} atoms")
+      # find specified frame
+      frame = t[frame_index] 
+
+      # loop through all particles in frame and call add_gaussian function
+      for iatom in range(frame.particles.N):
+          myP = P # all atom types currently use same sigma. Should be able to generalize...
+          pos = frame.particles.position[iatom]
+          atomtype_index = frame.particles.typeid[iatom]
+
+          # TODO: calling this function within a double for-loop over particles and frames is killing performance
+          #       it would be worth thinking about a more efficient implementation
+          # initial idea: try pybinding this function or numba?
+          add_hockney_eastwood_function(fields[atomtype_index], center=pos, P=myP, height=1)
+          
+          # TODO: in principle it should be possible to also initialize using Gaussians
+          # however add_gaussians function currently searches over all grid points which makes it much to slow
+          #add_gaussian(field, center=pos, sigma=mysigma, height=1)
+    
+    # fields contain total over ALL frames, need to compute average
+    for field in fields:
+      field.data /= nframes_to_average
+      if normalize:
+        field.data /= rho0 # I'm not sure if this normalization is quite right...seems to work reasonably though...
+
+    # output (for debugging)
+    #write_to_file("fields.dat",fields)
+    #write_to_VTK("fields.vtk",fields)
+
+    # return field
+    return fields
+
 
 def add_hockney_eastwood_function(field,center, P, height = 1):
     ''' add a Hockney Eastwood function of order P to field
@@ -413,15 +499,22 @@ def add_hockney_eastwood_function(field,center, P, height = 1):
     dim = field.dim
 
     center = np.array(center) # recast center to array
-
+    
     # box must be orthorhombic
     assert(field.is_orthorhombic()), f"Error: h must be orthorhombic in add_gaussian function. {h}"
+    boxl = np.diag(h)
     
     # voxels must be cubic 
     grid_spacings = np.diag(h) / npw # since field is orthorhombic, gridspacings will be of length dim
     assert (np.allclose(grid_spacings, grid_spacings[0],atol=1e-2)), f"voxels must be cubic {grid_spacings = }"
+
     
-    xparticle = center / np.diag(h) * npw # xparticle should be in range [0,npw)
+    xparticle = center / boxl * npw # xparticle should be in range [0,npw)
+
+    # check that 'center' and 'xparticle' are in appropriate range
+    #for d in range(dim):
+    #  assert(center[d] >= 0 and center[d] < boxl[d]), f"Invalid 'center' position specified {center = }"
+    #  assert(xparticle[d] >= 0 and xparticle[d] < npw[d]), f"Invalid {xparticle = }"
      
     # apply PBC to xparticle
     for idim in range(dim):

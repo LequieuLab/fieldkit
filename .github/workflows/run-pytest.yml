@@ -33,6 +33,7 @@ jobs:
         python -m pip install mdtraj
         python -m pip install scikit-image
         python -m pip install pandas
+        python -m pip install gsd
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
       env: 
