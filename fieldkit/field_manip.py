@@ -63,7 +63,75 @@ def change_resolution(fields_old,resolution_new):
     field_new = Field(h=field_old.h, npw_Nd=npw_new, data=data_new)
     fields_new.append(field_new)
 
-  return fields_new
+    return fields_new
+
+def cubic_voxels(fields_old,tol=0.01):
+    """For a list of Field objects, change the resolution of each Field object so that the voxels are approximately cubic
+
+      Args:
+          field_old: a list of Field objects
+          tol: tolerable error for how cubic you want the voxels to be
+     
+      Returns:
+          field_new: a list of Field objects with each object set to a new resolution that is approximately cubic
+          
+    """
+
+    # perform checks on all fields
+    for i in range(len(fields_old)):
+        assert(fields_old[i].is_orthorhombic), "For voxels to be cubic, cell must be orthorhombic"
+        assert(fields_old[i].dim == 3),"dimension must be 3"
+        if i != 1:
+          assert(np.all(fields_old[i].h == fields_old[i-1].h)),"h must be equal for all fields"
+          assert(np.all(fields_old[i].npw_Nd == fields_old[i-1].npw_Nd)),"h must be equal for all fields"
+
+    # since all fields have same h and npw_Nd, just use first field
+    field_old = fields_old[0] 
+
+    L = np.diag(field_old.h) # L will be constant     
+    npw_Nd = np.array(field_old.npw_Nd) # npw_Nd will vary within while loop 
+    #print(f"{L = }")
+
+    # preliminaries 
+    L_per_voxel = L / npw_Nd
+    diff_per_dim = _calc_cubic_voxel_difference(L_per_voxel)
+    error = np.max(np.abs(diff_per_dim))
+    npw_attempts = [list(npw_Nd)] 
+
+    while  error > tol:
+        error_per_dim = np.abs(diff_per_dim)
+        max_error_index = error_per_dim.argmax()
+        if diff_per_dim[max_error_index] < 0:
+            # max error voxel length is too small. need to DECREASE npw in this dim
+            npw_Nd[max_error_index] -= 1
+        else:
+            # max error voxel length is too BIG. need to INCREASE npw in this dim
+            npw_Nd[max_error_index] += 1
+
+        # if this npw has already been tried, then multiply by two and continue
+        if list(npw_Nd) in npw_attempts:
+            npw_Nd *= 2 # double all npw and continue
+
+        # now update error
+        L_per_voxel = L / npw_Nd
+        diff_per_dim = _calc_cubic_voxel_difference(L_per_voxel)
+        error = np.max(np.abs(diff_per_dim))
+        npw_attempts.append(list(npw_Nd)) # not casting as list, this makes comparison above easier
+        #print(f"{npw_Nd = } {L_per_voxel=} {diff_per_dim=} {error=}")
+      
+    # using the updated npw_Nd create new fields
+    fields_new = change_resolution(fields_old,npw_Nd)
+    print(f"To make cubic voxels, new grid resolution is {npw_Nd}, voxel lengths are {L_per_voxel}, error = {error : .2e}")
+    return fields_new
+        
+def _calc_cubic_voxel_difference(L_per_voxel):
+    ''' Helper function to calculate how "uncubic" a voxel is
+        Args:
+            L_per_voxel: array storing the length of each side of voxel. should have 'dim' elements
+        Returns: the error of each dimension (here the absolute value of the deviation of from the median)
+    '''
+    Lmedian = np.average(L_per_voxel)
+    return L_per_voxel - Lmedian
 
 def replicate_fields(fields, nreplicates):    
     """ For a list of Fields, replicate each Field object by nreplicates.
