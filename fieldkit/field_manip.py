@@ -63,7 +63,7 @@ def change_resolution(fields_old,resolution_new):
     field_new = Field(h=field_old.h, npw_Nd=npw_new, data=data_new)
     fields_new.append(field_new)
 
-    return fields_new
+  return fields_new
 
 def cubic_voxels(fields_old,tol=0.01):
     """For a list of Field objects, change the resolution of each Field object so that the voxels are approximately cubic
