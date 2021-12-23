@@ -233,12 +233,13 @@ def expand_dimension(fields, dim_new, npw_new, boxl_new):
         if dim_new == 2:
           data = np.tile(field.data,(npw_new[0],1)).T
         if dim_new == 3:
-          data = np.tile(field.data,(npw_new[0], 1 ,1)).T
+          data = np.tile(field.data.T,(npw_new[0], 1 ,1)).T
       if nexpand == 2:
         assert(dim_new == 3 and dim == 1), "only way to expand by 2 is from 1d to 3d"
-        data = np.tile(field.data,(npw_new[1], npw_new[0] ,1)).T
+        data = np.tile(field.data.T,(npw_new[1], npw_new[0] ,1)).T
 
       #print(f"{npw = }, {h = } {data.shape = }")
+      #breakpoint()
       fields_new.append(Field(npw_Nd=npw, h=h, data=data))
 
     return fields_new
