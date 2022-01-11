@@ -25,10 +25,10 @@ If Python does not recognize fieldkit as an installed Python package
 
 * For one session::
 
-   export PYTHONPATH="$HOME/FTS-tools"
+   export PYTHONPATH="$HOME/fieldkit"
 
 * By default for any terminal session::
 
    vim ~/.bashrc
-   export PYTHONPATH="$HOME/FTS-tool"
+   export PYTHONPATH="$HOME/fieldkit"
 
