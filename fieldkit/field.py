@@ -63,6 +63,8 @@ class Field:
         else:
             return False
         
+    def volume(self):
+      return np.linalg.det(self.h)
 
     def set_h(self,h):
         """ Checks that h is square and sets coords. """
