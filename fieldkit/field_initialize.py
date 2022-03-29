@@ -272,7 +272,7 @@ def add_gaussian(field, center, sigma, height=1):
     center = np.array(center) # recast center to array
    
     # box must be orthorhombic
-    assert(field.is_orthorhombic()), f"Error: h must be orthorhombic in add_gaussian function. {h}"
+    #assert(field.is_orthorhombic()), f"Error: h must be orthorhombic in add_gaussian function. {h}"
     
     boxl = np.diag(h)
     boxh = 0.5*boxl

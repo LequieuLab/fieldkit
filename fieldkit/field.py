@@ -68,6 +68,7 @@ class Field:
 
     def set_h(self,h):
         """ Checks that h is square and sets coords. """
+        
         assert(self.dim*self.dim == h.size)
         for i in range(len(h.shape)):
             assert(h.shape[i] == self.dim)

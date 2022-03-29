@@ -31,6 +31,7 @@ release = '08/28/2021'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+        'nbsphinx',
         'sphinx.ext.autodoc',
         'sphinx.ext.napoleon',
         'sphinx.ext.viewcode'
