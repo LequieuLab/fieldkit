@@ -43,6 +43,7 @@ def plot(fields,dpi=100):
         fig.colorbar(pc,ax=ax)
 
     if field.dim == 3:
+        raise RuntimeError("plot() function not implemented for 3d fields. Use the fk.write_to_VTK() function instead")
         pass
 
   plt.tight_layout()
