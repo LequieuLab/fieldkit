@@ -106,6 +106,8 @@ def write_to_file(filename, fields):
     fields = [fields]
     nfields = len(fields)
 
+  print(f"Writting {nfields} fields to {filename}")
+
   # confirm that all fields have same dimension and coords
   for i in range(nfields):
     if (i !=0 ):

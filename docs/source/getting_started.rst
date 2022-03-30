@@ -8,7 +8,7 @@ The following Python packages and software must be installed:
 
    * numpy - to run most fieldkit functions
    * matplotlib or gnuplot - to model 1D fields
-   * Paraview - to model 2D and 3D fields
+   * Paraview - to model 2D and 3D fields (prefer to install via conda?)
    * Pytest (optional) - to run unit tests in the tests folder
 
 Installing Paraview

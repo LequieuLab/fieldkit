@@ -146,6 +146,14 @@ def replicate_fields(fields, nreplicates):
 
     """
 
+    # if single entry, convert it to a list
+    # TODO: I should probably adda utility function that does this
+    try:
+      nfields = len(fields)
+    except TypeError:
+      fields = [fields]
+      nfields = len(fields)
+   
     field_list = []
     
     #replicate each Field object by nreplicates
@@ -183,6 +191,14 @@ def roll(fields, shift):
         fields_new: a list of Field objects, in which each Field object has been translated. 
 
     """
+    # if single entry, convert it to a list
+    # TODO: I should probably adda utility function that does this
+    try:
+      nfields = len(fields)
+    except TypeError:
+      fields = [fields]
+      nfields = len(fields)
+ 
 
     fields_new = []
     for field in fields:    

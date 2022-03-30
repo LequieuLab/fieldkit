@@ -17,7 +17,9 @@ and painless so that the user can focus on the science.
 .. toctree::
    :caption: Tutorial
 
-   tutorials/demo
+   tutorials/00_fieldkit_basics
+   tutorials/01_fieldkit_and_openfts
+   tutorials/02_manipulate_fields
 
 .. toctree::
    :maxdepth: 4
