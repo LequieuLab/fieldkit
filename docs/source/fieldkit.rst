@@ -1,8 +1,31 @@
 fieldkit package
 ================
 
+.. autosummary:: 
+    :recursive:
+    :nosignatures:
 
-Field class
+    fieldkit.analyze
+    fieldkit.field
+    fieldkit.fileio
+    fieldkit.initialize
+    fieldkit.manipulate
+    fieldkit.plot
+
+
+.. Note: the code below was generated using the sphinx-apidoc tool
+   sphinx-apidoc -o tmp ../../fieldkit/
+
+
+fieldkit.analyze module
+-----------------------
+
+.. automodule:: fieldkit.analyze
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+fieldkit.field module
 ---------------------
 
 .. automodule:: fieldkit.field
@@ -10,27 +33,36 @@ Field class
    :undoc-members:
    :show-inheritance:
 
-field\_initialize module
----------------------------------
+fieldkit.fileio module
+----------------------
 
-.. automodule:: fieldkit.field_initialize
-   :members: add_ellipse, initialize_phase
+.. automodule:: fieldkit.fileio
+   :members:
    :undoc-members:
    :show-inheritance:
 
-field\_io module
--------------------------
+fieldkit.initialize module
+--------------------------
 
-.. automodule:: fieldkit.field_io
-   :members: read_from_file, write_to_file, write_to_VTK
+.. automodule:: fieldkit.initialize
+   :members:
    :undoc-members:
    :show-inheritance:
 
-field\_manip module
-----------------------------
+fieldkit.manipulate module
+--------------------------
 
-.. automodule:: fieldkit.field_manip
-   :members: change_resolution, replicate_fields, roll
+.. automodule:: fieldkit.manipulate
+   :members:
    :undoc-members:
    :show-inheritance:
+
+fieldkit.plot module
+--------------------
+
+.. automodule:: fieldkit.plot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 

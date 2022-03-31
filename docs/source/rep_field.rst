@@ -1,7 +1,7 @@
 Replicating Fields
 ==================
 
-.. automodule:: fieldkit.field_manip
+.. automodule:: fieldkit.manipulate
    :members: replicate_fields
    :undoc-members:
    :show-inheritance:
@@ -28,15 +28,15 @@ This example shows how to replicate a field by a number of replicates ::
 
 The following example outputs three 2D VTK files - field with resolution of (32,32), field replicated by (2,2), and field replicated by (2,4)
 
-..  image:: field_32_32.png
+..  image:: ./figs/field_32_32.png
    :width: 200
    :alt: field with resolution of (32,32)
 
-..  image:: rep_2_2.png
+..  image:: ./figs/rep_2_2.png
    :width: 200
    :alt: field replicated by (2,2)
 
-..  image:: rep_2_4.png
+..  image:: ./figs/rep_2_4.png
    :width: 200
    :alt: field with replicated by (2,4)
 

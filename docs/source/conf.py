@@ -18,7 +18,7 @@ sys.path.append('~/fieldkit/fieldkit')
 # -- Project information -----------------------------------------------------
 
 project = 'fieldkit'
-copyright = '2021, LequieuLab'
+copyright = '2021, Drexel University, Joshua Lequieu'
 author = 'LequieuLab'
 
 # The full version, including alpha/beta/rc tags
@@ -33,6 +33,7 @@ release = '08/28/2021'
 extensions = [
         'nbsphinx',
         'sphinx.ext.autodoc',
+        'sphinx.ext.autosummary',
         'sphinx.ext.napoleon',
         'sphinx.ext.viewcode'
         ]

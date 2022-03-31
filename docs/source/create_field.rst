@@ -14,7 +14,7 @@ Reading and Writing Functions
 -----------------------------
 All functions are found in field_io.py
 
-.. automodule:: fieldkit.field_io
+.. automodule:: fieldkit.fileio
    :members: read_from_file, write_to_file, write_to_VTK
    :undoc-members:
    :show-inheritance:
@@ -34,7 +34,7 @@ Uses all three functions from above to create a Field object from density.dat an
 
 **Output**
 
-..  image:: example_read_output.png
+..  image:: ./figs/example_read_output.png
    :width: 800
 
 density.vtk (left) and tmp.dat(right) are the putput files of write_to_VTK and write_to_file functions, respeictively

@@ -16,16 +16,16 @@ Visualizing Fields
    plt.plot(newfields[0].coords, newfields[0].data)
    plt.show()
 
-..  image:: matplotlib.png
+..  image:: ./figs/matplotlib.png
    :width: 800
 
 **gnuplot example**
 
-On Terminal (Linux): gnuplot
-::
+On Terminal (Linux): gnuplot ::
+
    p './density_1D.dat' u 1:2
 
-..  image:: gnuplot.png
+..  image:: ./figs/gnuplot.png
    :width: 800
 
 
@@ -42,7 +42,7 @@ On Terminal: paraview density.vtk
 
 On Paraview: Click "Apply" and change Representation to "Surface"
 
-..  image:: visualize1.png
+..  image:: ./figs/visualize1.png
    :width: 800
 
 
@@ -54,7 +54,7 @@ On Terminal: paraview A15.vtk
 
 On Paraview: Click "Apply" and change Representation to "Volume"
 
-..  image:: visualize2.png
+..  image:: ./figs/visualize2.png
    :width: 800
 
 

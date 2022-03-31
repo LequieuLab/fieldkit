@@ -1,7 +1,7 @@
-Adding an ellipse to an existing field
-======================================
+Adding an ellipse
+=================
 
-.. automodule:: fieldkit.field_initialize
+.. automodule:: fieldkit.initialize
    :members: add_ellipse
    :undoc-members:
    :show-inheritance:
@@ -32,15 +32,15 @@ This examples shows how to add one of more ellipses in 1D/2D.::
 
 From the example code above, three VTK files are outputted and plotted below in Paraview - field.vtk (left), field_one_ellipse (middle), and field_multi_ellipse.vtk (right).
 
-..  image:: field_no_ellipse.png
+..  image:: ./figs/field_no_ellipse.png
    :width: 200
    :alt: field with no ellipse
 
-..  image:: field_ellipse.png
+..  image:: ./figs/field_ellipse.png
    :width: 200
    :alt: field with one ellipse
 
-..  image:: field_multi_ellipse.png
+..  image:: ./figs/field_multi_ellipse.png
    :width: 200
    :alt: field with multiple ellipse
 

@@ -1,7 +1,7 @@
 Changing the resolution of a field
 ==================================
 
-.. automodule:: fieldkit.field_manip
+.. automodule:: fieldkit.manipulate
    :members: change_resolution
    :undoc-members:
    :show-inheritance:
@@ -28,15 +28,15 @@ This example shows how to change the resolution of an existing field. ::
 
 The following example outputs three 2D VTK files - field with resolution of (32,32), field with resolution of (64,64), and field with resolution of (2,4) 
 
-..  image:: field_32_32.png
+..  image:: ./figs/field_32_32.png
    :width: 200
    :alt: field with resolution of (32,32)
 
-..  image:: field_64_64.png
+..  image:: ./figs/field_64_64.png
    :width: 200
    :alt: field with resolution of (64,64)
 
-..  image:: field_2_4.png
+..  image:: ./figs/field_2_4.png
    :width: 200
    :alt: field with resolution of (2,4)
 

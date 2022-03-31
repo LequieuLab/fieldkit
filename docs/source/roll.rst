@@ -1,7 +1,7 @@
 Rolling Fields
 ==================================
 
-.. automodule:: fieldkit.field_manip
+.. automodule:: fieldkit.manipulate
    :members: roll
    :undoc-members:
    :show-inheritance:
@@ -22,9 +22,9 @@ Example
 
 Before using the roll function (left) and after using the roll function (right)
 
-..  image:: field_before_roll.png
+..  image:: ./figs/field_before_roll.png
    :width: 300
 
-..  image:: field_after_roll.png
+..  image:: ./figs/field_after_roll.png
    :width: 300
 

@@ -3,47 +3,65 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-fieldkit documentation
+Fieldkit documentation
 ========================
 
-**fieldkit** is a Python module for working with field files used by OpenFTS and PolyFTS.
-The goal of **fieldkit** is to make analyzing, plotting, and manipulating field files easy 
-and painless so that the user can focus on the science.
+Fieldkit is a Python package for working with field files used by OpenFTS (and PolyFTS).
+The goal of fieldkit is to make analyzing, plotting, and manipulating field files easy 
+and painless.
 
-.. note::
-   This project is under active development and this documentation is incomplete. 
+Quickstart
+=============
+
+1. Install dependencies: 
+
+    * numpy, scipy, matplotlib (for core functionality)
+    * pytest (for unit tests)
+    * sphinx (for documentation)
+    * mdtraj, gsd, scikit-image, pandas (for some specialized functionality)
+    * Paraview (for VTK visualization)
+
+2. Update your `PYTHONPATH` to contain **fieldkit**::
+  
+    export PYTHONPATH=<path>/fieldkit:$PYTHONPATH
+
+3. Check that everything works ::
+
+    python3 -c "import fieldkit as fk; field = fk.Field(npw_Nd=(32,32))"
+
+Take a look at the :ref:`/tutorials/00_fieldkit_basics.ipynb` tutorial to learn more.
 
 
 .. toctree::
-   :caption: Tutorial
+   :caption: Tutorials
 
    tutorials/00_fieldkit_basics
    tutorials/01_fieldkit_and_openfts
    tutorials/02_manipulate_fields
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Getting Started 
+   :caption: Reference
+   :maxdepth: 1
 
-   getting_started 
+  
+.. toctree::
+   :maxdepth: 2
+   :caption: Fieldkit API
+
+   fieldkit
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Additional examples
+
+   add_ellipse
+   change_resolution
+   rep_field
+   roll
    create_field
    initialize_phases
-   
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Additional References
-
-   manipulate_fields
    visualize
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Module
-
-   modules
-
-
+ 
 
 
 Indices and tables

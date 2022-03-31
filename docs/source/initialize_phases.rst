@@ -1,7 +1,7 @@
 Initializing 3D Phases with 2 or 3 species
 ==========================================
 
-.. automodule:: fieldkit.field_initialize
+.. automodule:: fieldkit.initialize
    :members: initialize_phase
    :undoc-members:
    :show-inheritance:
@@ -26,12 +26,12 @@ The following example outputs vtk files for Field objects created by the initial
 
 **Output**
 
-..  image:: A15.0000.png
+..  image:: ./figs/A15.0000.png
    :width: 600
 
 Data from A15.vtk plotted in Paraview
 
-..  image:: alt-C15.0000.png
+..  image:: ./figs/alt-C15.0000.png
    :width: 600
 
 Data from alt-C15.vtk plotted in Paraview
