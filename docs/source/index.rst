@@ -33,6 +33,7 @@ Take a look at the :ref:`/tutorials/00_fieldkit_basics.ipynb` tutorial to learn 
    tutorials/00_fieldkit_basics
    tutorials/01_fieldkit_and_openfts
    tutorials/02_manipulate_fields
+   usage_from_shell_scripts
 
 .. toctree::
    :caption: Reference
