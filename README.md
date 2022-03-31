@@ -6,7 +6,7 @@ Documentation can be viewed at:
   * https://fieldkit.readthedocs.io/
   * Building the documentation from source:
   
-      cd docs
-      make html
-      firefox build/html/index.html
+        cd docs
+        make html
+        firefox build/html/index.html
 
