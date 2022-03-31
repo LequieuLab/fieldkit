@@ -40,5 +40,5 @@ jobs:
       env: 
         PYTHONPATH: ${{runner.workspace}}/fieldkit
       run: |
-        cd ${GITHUB_WORKSPACE}/tests/fieldkit-functions-tests
+        cd ${GITHUB_WORKSPACE}/tests/
         pytest
