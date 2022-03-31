@@ -1,4 +1,12 @@
 # fieldkit
-fieldkit is a Python package used to visualize and manipulate 1D, 2D, and 3D fields. 
+fieldkit is a Python package for working with field files used by OpenFTS (and PolyFTS). The goal of fieldkit is to make analyzing, plotting and manipulating fields easy and painless.
 
-View Sphinx documentation by changing directory to /docs and building the doc with the command `make html`.
+Documentation can be viewed at:
+
+  * https://fieldkit.readthedocs.io/
+  * Building the documentation from source:
+  
+      cd docs
+      make html
+      firefox build/html/index.html
+
