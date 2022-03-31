@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+''' 
+Functions to help set the value of fields
+'''
 
 import numpy as np
 
 from .field import *
-from .field_io import *
+from .fileio import *
+
     
 def update_species_field_gaussians(field, centers, npw, magnitude, x, y, z):
     #parameters for all spheres phases
@@ -177,10 +180,10 @@ def initialize_phase(phase, npw, h):
         raise NotImplementedError("Invalid phase: {}".format(phase))
     
     if nspecies == 2:
-        field_list = [Field(npw_Nd=npw, data=w_A, h = h), Field(npw_Nd=npw, data=w_B, h = h)]
+        field_list = [Field(npw=npw, data=w_A, h = h), Field(npw=npw, data=w_B, h = h)]
     elif nspecies == 3:
         w_B = np.random.random(npw)
-        field_list = [Field(npw_Nd=npw, data=w_A, h=h), Field(npw_Nd=npw, data=w_B, h=h), Field(npw_Nd=npw, data=w_C, h=h)]
+        field_list = [Field(npw=npw, data=w_A, h=h), Field(npw=npw, data=w_B, h=h), Field(npw=npw, data=w_C, h=h)]
     
     return field_list
         
@@ -206,7 +209,7 @@ def add_ellipse(field, center, axis_lengths, smoothing_width = 0.05,height=1,uni
     """
     
   
-    npw = field.npw_Nd
+    npw = field.npw
     dim = len(npw)
     h = field.h
     assert(len(axis_lengths) == dim)
@@ -261,7 +264,7 @@ def add_gaussian(field, center, sigma, height=1):
         height: height of Gaussian
         
     '''
-    npw = field.npw_Nd
+    npw = field.npw
     invM = 1.0/np.prod(npw)
     h = field.h # cell tensor
     dim = field.dim
@@ -365,7 +368,7 @@ def particle_to_field(trjfile, topfile, frames_to_average, npw, P):
     print(f"Creating {natomtypes} fields for {natomtypes} found atom types")
     fields = []
     for itype in range(natomtypes):
-      fields.append(Field(npw_Nd = npw, h=h))
+      fields.append(Field(npw = npw, h=h))
 
     for frame_index in frames_to_average:
       print(f"Processing frame {frame_index} containing {frame.n_atoms} atoms")
@@ -448,7 +451,7 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False):
     print(f"Creating {natomtypes} fields for {natomtypes} found atom types")
     fields = []
     for itype in range(natomtypes):
-      fields.append(Field(npw_Nd = npw, h=h))
+      fields.append(Field(npw = npw, h=h))
 
     for frame_index in frames_to_average:
       print(f"Processing frame {frame_index} containing {frame.particles.N} atoms")
@@ -494,7 +497,7 @@ def add_hockney_eastwood_function(field,center, P, height = 1):
         height: total integral of function TODO: probably better to rename this from "height" to something else
         
     '''
-    npw = field.npw_Nd
+    npw = field.npw
     h = field.h # cell tensor
     dim = field.dim
 

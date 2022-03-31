@@ -1,10 +1,14 @@
+'''
+Defines the main Field class object
+'''
+
 import numpy as np
 
 class Field:
     """ Class for Field object used to model 1D, 2D, 3D structures.
     
     Attributes:
-        npw_Nd: number of grid points in each dimension
+        npw: number of grid points in each dimension
         npw_total: total number of grid points for all dimensions
         dim: dimension of field
         data: stored values of field at each grid point
@@ -13,26 +17,26 @@ class Field:
         coords: stores x,y,z coordinates of each grid point
         
     """
-    def __init__(self,npw_Nd=None, data=None, h=None):
+    def __init__(self,npw=None, data=None, h=None):
         """ Defines default values for class attributes. """
-        self.npw_Nd = None        
+        self.npw = None        
         self.npw_total = None     
-        self.dim = len(npw_Nd)             
+        self.dim = len(npw)             
         self.data = None        
         self.h = None             
         self.is_real_space = True 
         self.coords = None       
 
         #manipulate attributes based on input values
-        if np.all(npw_Nd != None):
-            self.npw_Nd = tuple(npw_Nd)
-            self.npw_total = np.prod(npw_Nd)
+        if np.all(npw != None):
+            self.npw = tuple(npw)
+            self.npw_total = np.prod(npw)
         
         # initialize data
         if np.all(data != None):
             self.set_data(data)
-        elif np.all(npw_Nd != None): 
-            self.data= np.zeros(npw_Nd) # default to zeros
+        elif np.all(npw != None): 
+            self.data= np.zeros(npw) # default to zeros
         
         # initialize h
         if np.all(h != None):
@@ -47,7 +51,11 @@ class Field:
       elif self.dim == 3:
         hvoxel = np.array([self.coords[1,0,0],self.coords[0,1,0],self.coords[0,0,1]])
       return hvoxel
-        
+
+    def is_complex(self):
+      ''' return if field is complex or not'''
+      return self.data.dtype == complex
+
     def is_orthorhombic(self):
         # sanity checks
         #assert(self.h != None), "Calling is_orthorhombic but h is not initialized"
@@ -84,11 +92,11 @@ class Field:
         if self.npw_total != None:
             # if already init with size, check that size matches
             assert(data.size == self.npw_total)
-            assert(data.shape == self.npw_Nd)
+            assert(data.shape == self.npw)
         else:
             # if not yet init with size, then infer size from data
             self.npw_total = data.size
-            self.npw_Nd = data.shape
+            self.npw = data.shape
             self.dim = len(data.shape)
             assert (self.dim >= 1 and self.dim <=3)
     
@@ -98,9 +106,9 @@ class Field:
    
     def CoordsFromH(self):
         """Compute coordinates of field from current "h" box vector."""
-        coords = np.zeros(list(self.npw_Nd)+[self.dim])
-        for idx in np.ndindex(self.npw_Nd):
-            x = np.array(idx) / self.npw_Nd #0-1
+        coords = np.zeros(list(self.npw)+[self.dim])
+        for idx in np.ndindex(self.npw):
+            x = np.array(idx) / self.npw #0-1
             r = np.matmul(self.h,x)
             coords[idx] = r
         return coords;

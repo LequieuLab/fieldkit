@@ -1,3 +1,8 @@
+'''
+Functions to read/write fields to files
+'''
+
+
 import numpy as np
 import logging
 import sys
@@ -81,7 +86,7 @@ def read_from_file(filename):
   for ifield in range(nfields):
     # reshape data before creating field
     data = np.reshape(fields_flat[:,ifield] , npw)
-    field_list.append(Field(h=h,npw_Nd=npw,data=data))
+    field_list.append(Field(h=h,npw=npw,data=data))
 
   return field_list
 
@@ -112,7 +117,7 @@ def write_to_file(filename, fields):
   for i in range(nfields):
     if (i !=0 ):
       assert (fields[i].dim == fields[i-1].dim)
-      assert (fields[i].npw_Nd == fields[i-1].npw_Nd)
+      assert (fields[i].npw == fields[i-1].npw)
       assert (np.all(fields[i].h == fields[i-1].h))
       assert (np.all(fields[i].is_real_space == fields[i-1].is_real_space))
       assert (np.all(fields[i].data.dtype == fields[i-1].data.dtype))
@@ -120,7 +125,7 @@ def write_to_file(filename, fields):
 
   # set values
   dim = fields[0].dim 
-  npw = fields[0].npw_Nd
+  npw = fields[0].npw
   h = fields[0].h
   coords = fields[0].coords
   assert(fields[0].is_real_space), "Can only currently write real space fields"
@@ -231,12 +236,12 @@ def write_to_VTK(filename, fields):
     
     #Check if fields in Field object are compatible for VTK
     for i in range(1,len(fields)):
-        assert(fields[i-1].npw_Nd == fields[i].npw_Nd)
+        assert(fields[i-1].npw == fields[i].npw)
         assert((fields[i-1].h == fields[i].h).all())
 
     #parameters
     dim = fields[0].dim
-    npw = fields[0].npw_Nd
+    npw = fields[0].npw
     orthorhombic = True
     binary = False
     M = fields[0].npw_total

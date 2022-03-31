@@ -1,8 +1,23 @@
+'''
+Functions to plot fields 
+'''
 
 from .field import *
 import matplotlib.pyplot as plt
 
-def plot(fields,dpi=100):
+def plot(fields,dpi=100,show=True,filename=None):
+  """Plot fields using matplotlib
+    
+    Args: 
+      fields: a list of Field objects
+      dpi: dpi (resolution) of specified image
+      show: whether or not to show the plot
+      filename: output filename for plotfile
+
+    Returns:
+      none
+
+  """
   try:
     nfields = len(fields)
   except TypeError:
@@ -22,31 +37,54 @@ def plot(fields,dpi=100):
  
   fig = plt.figure(figsize=(ncols*3.33,nrows*3.33),dpi=dpi)
 
-  # TODO: need to handle multiple fields by creating multiple axes
-  axes = fig.subplots(nrows,ncols,squeeze=False)
- 
-  for i,ax in np.ndenumerate(axes):
+  for i in np.ndindex(nrows,ncols):
     ifield = i[0]*ncols + i[1]*nrows
     field = fields[ifield]
 
-    if field.dim == 1:
-        ax.plot(field.coords,field.data,label=f'Field {i}' )
-        ax.legend()
+    # create new axis for plot
+    if fields[0].dim <= 2:
+      ax = fig.add_subplot(nrows,ncols,ifield+1)
+    else:
+      ax = fig.add_subplot(nrows,ncols,ifield+1, projection='3d')
 
-    if field.dim == 2:
+    # ignore complex part of data if it exists
+    if field.is_complex():
+      print(f"Note: not plotting imaginary part of field {ifield}")
+      data = field.data.real
+    else:
+      data = field.data
+
+    # set title
+    if nfields != 1:
+      ax.set_title(f'Field {ifield}')
+
+    if field.dim == 1:
         if nfields != 1:
           ax.set_title(f'Field {ifield}')
         ax.set_xlabel('x')
+        ax.set_ylabel('field value')
+        ax.plot(field.coords,data)
+
+    if field.dim == 2:
+        ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.axis('equal')
-        pc = ax.pcolormesh(field.coords[:,:,0],field.coords[:,:,1], field.data.real,shading='auto',cmap='coolwarm')
-        fig.colorbar(pc,ax=ax)
+        pc = ax.pcolormesh(field.coords[:,:,0],field.coords[:,:,1], data,shading='auto',cmap='coolwarm')
+        cb = fig.colorbar(pc,ax=ax)
+        cb.set_label('field value')
 
     if field.dim == 3:
-        raise RuntimeError("plot() function not implemented for 3d fields. Use the fk.write_to_VTK() function instead")
-        pass
+        from mpl_toolkits.mplot3d import Axes3D
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+        ax.scatter(field.coords[:,:,:,0], field.coords[:,:,:,1],field.coords[:,:,:,2],c=data,cmap='coolwarm')
 
   plt.tight_layout()
-  plt.show()
+  if filename:
+    plt.savefig(filename)
+
+  if show:
+    plt.show()
 
 

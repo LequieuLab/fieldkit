@@ -1,3 +1,6 @@
+'''
+Functions to analyze a field (identify domains, compute isosurfaces, etc)
+'''
 
 from .field import *
 
@@ -123,7 +126,7 @@ def _mesh_single_domain(field, idomain, density_threshold, domainID, image_flags
     3) Mesh the domain using marching cubes
     '''
 
-    Nx = field.npw_Nd
+    Nx = field.npw
     h = field.h
     dim = field.dim
 
@@ -259,7 +262,7 @@ def _plot_contours_2D(field, contours, surface=None, filename=None):
     ''' Plot a mesh from marching squares
     '''
     import matplotlib.pyplot as plt
-    Nx = field.npw_Nd
+    Nx = field.npw
     hvoxel = field.hvoxel()
 
     # Display the image and plot all contours found
@@ -353,11 +356,12 @@ def identify_discrete_domains(field, density_threshold):
         ndomains: the number of discrete domains 
         domainID: a ndarray of shape equal to field.data containing the index of that domain. If domainID == 0, it is the continuous domain. Points with domainID == i, correspond to the ith domain
         imageflags: imageflags in each dimension
+
     '''
 
     isdomain_array = field.data.real > density_threshold  # WARNING: only taking real
 
-    Nx = field.npw_Nd
+    Nx = field.npw
     dim = field.dim
 
     # if domainID == -1, it has not been visited
@@ -478,7 +482,7 @@ def _pbc_domain_locs(field, idomain,regionID, image_flags, local_com):
     
     dim = field.dim
     hvoxel = field.hvoxel() # TODO: remove all uses of hvoxel
-    Nx = field.npw_Nd
+    Nx = field.npw
       
 
     extra_com = []

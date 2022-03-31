@@ -1,3 +1,7 @@
+'''
+Functions to manipulate fields
+'''
+
 import numpy as np
 import copy
 
@@ -17,7 +21,7 @@ def change_resolution(fields_old,resolution_new):
   fields_new = []
   for field_old in fields_old: 
     
-    npw_old = field_old.npw_Nd
+    npw_old = field_old.npw
     npw_new = np.array(resolution_new)
     dim = len(npw_old)
     assert(dim == len(npw_new)), "dimension of fields must match resoltion"
@@ -60,7 +64,7 @@ def change_resolution(fields_old,resolution_new):
     data_new *= np.prod(npw_new/npw_old)
 
     # create a new field
-    field_new = Field(h=field_old.h, npw_Nd=npw_new, data=data_new)
+    field_new = Field(h=field_old.h, npw=npw_new, data=data_new)
     fields_new.append(field_new)
 
   return fields_new
@@ -83,45 +87,45 @@ def cubic_voxels(fields_old,tol=0.01):
         assert(fields_old[i].dim == 3),"dimension must be 3"
         if i != 1:
           assert(np.all(fields_old[i].h == fields_old[i-1].h)),"h must be equal for all fields"
-          assert(np.all(fields_old[i].npw_Nd == fields_old[i-1].npw_Nd)),"h must be equal for all fields"
+          assert(np.all(fields_old[i].npw == fields_old[i-1].npw)),"h must be equal for all fields"
 
-    # since all fields have same h and npw_Nd, just use first field
+    # since all fields have same h and npw, just use first field
     field_old = fields_old[0] 
 
     L = np.diag(field_old.h) # L will be constant     
-    npw_Nd = np.array(field_old.npw_Nd) # npw_Nd will vary within while loop 
+    npw = np.array(field_old.npw) # npw will vary within while loop 
     #print(f"{L = }")
 
     # preliminaries 
-    L_per_voxel = L / npw_Nd
+    L_per_voxel = L / npw
     diff_per_dim = _calc_cubic_voxel_difference(L_per_voxel)
     error = np.max(np.abs(diff_per_dim))
-    npw_attempts = [list(npw_Nd)] 
+    npw_attempts = [list(npw)] 
 
     while  error > tol:
         error_per_dim = np.abs(diff_per_dim)
         max_error_index = error_per_dim.argmax()
         if diff_per_dim[max_error_index] < 0:
             # max error voxel length is too small. need to DECREASE npw in this dim
-            npw_Nd[max_error_index] -= 1
+            npw[max_error_index] -= 1
         else:
             # max error voxel length is too BIG. need to INCREASE npw in this dim
-            npw_Nd[max_error_index] += 1
+            npw[max_error_index] += 1
 
         # if this npw has already been tried, then multiply by two and continue
-        if list(npw_Nd) in npw_attempts:
-            npw_Nd *= 2 # double all npw and continue
+        if list(npw) in npw_attempts:
+            npw *= 2 # double all npw and continue
 
         # now update error
-        L_per_voxel = L / npw_Nd
+        L_per_voxel = L / npw
         diff_per_dim = _calc_cubic_voxel_difference(L_per_voxel)
         error = np.max(np.abs(diff_per_dim))
-        npw_attempts.append(list(npw_Nd)) # not casting as list, this makes comparison above easier
-        #print(f"{npw_Nd = } {L_per_voxel=} {diff_per_dim=} {error=}")
+        npw_attempts.append(list(npw)) # not casting as list, this makes comparison above easier
+        #print(f"{npw = } {L_per_voxel=} {diff_per_dim=} {error=}")
       
-    # using the updated npw_Nd create new fields
-    fields_new = change_resolution(fields_old,npw_Nd)
-    print(f"To make cubic voxels, new grid resolution is {npw_Nd}, voxel lengths are {L_per_voxel}, error = {error : .2e}")
+    # using the updated npw create new fields
+    fields_new = change_resolution(fields_old,npw)
+    print(f"To make cubic voxels, new grid resolution is {npw}, voxel lengths are {L_per_voxel}, error = {error : .2e}")
     return fields_new
         
 def _calc_cubic_voxel_difference(L_per_voxel):
@@ -159,7 +163,7 @@ def replicate_fields(fields, nreplicates):
     #replicate each Field object by nreplicates
     for f in range(len(fields)):
         dim = fields[0].dim
-        npw = fields[0].npw_Nd
+        npw = fields[0].npw
         h = fields[0].h
     
         if dim == 1:
@@ -171,7 +175,7 @@ def replicate_fields(fields, nreplicates):
             
         fields_new = np.tile(fields[f].data.real, rep)
         npw_new = np.array(npw) * nreplicates
-        field_obj = Field(npw_Nd=npw_new, data=fields_new, h=h)
+        field_obj = Field(npw=npw_new, data=fields_new, h=h)
         
 
         coords_new = field_obj.CoordsFromH()            
@@ -202,7 +206,7 @@ def roll(fields, shift):
 
     fields_new = []
     for field in fields:    
-        npw = field.npw_Nd
+        npw = field.npw
         dim = field.dim
         assert(len(shift) == dim)
 
@@ -238,7 +242,7 @@ def expand_dimension(fields, dim_new, npw_new, boxl_new):
       assert(field.is_orthorhombic()), "field must be orthorhombic"
    
       nexpand = dim_new - dim
-      npw = list(field.npw_Nd) 
+      npw = list(field.npw) 
       boxl = list(np.diag(field.h))
       for i in range(nexpand) :
         npw.append(npw_new[i])
@@ -256,7 +260,7 @@ def expand_dimension(fields, dim_new, npw_new, boxl_new):
 
       #print(f"{npw = }, {h = } {data.shape = }")
       #breakpoint()
-      fields_new.append(Field(npw_Nd=npw, h=h, data=data))
+      fields_new.append(Field(npw=npw, h=h, data=data))
 
     return fields_new
 
