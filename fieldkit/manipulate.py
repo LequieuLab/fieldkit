@@ -7,22 +7,31 @@ import copy
 
 from .field import *
 
-def change_resolution(fields_old,resolution_new):
+def change_resolution(fields,npw_new):
   """For a list of Field objects, change the resolution of each Field object.
 
     Args:
-        field_old: a list of Field objects
-        resolution_new: a tuple that defines the new resolution of each Field object.
+        field: a list of Field objects
+        npw_new: a tuple that defines the new resolution of each Field object.
    
     Returns:
-        field_new: a list of Field objects with each object set to a resolution of resolution_new.
+        field_new: a list of Field objects with each object set to a resolution of npw_new.
         
   """
+
+  # if single entry, convert it to a list
+  # TODO: I should probably adda utility function that does this
+  try:
+    nfields = len(fields)
+  except TypeError:
+    fields = [fields]
+    nfields = len(fields)
+ 
   fields_new = []
-  for field_old in fields_old: 
+  for field_old in fields: 
     
     npw_old = field_old.npw
-    npw_new = np.array(resolution_new)
+    npw_new = np.array(npw_new)
     dim = len(npw_old)
     assert(dim == len(npw_new)), "dimension of fields must match resoltion"
     
@@ -224,6 +233,18 @@ def roll(fields, shift):
 
 
 def expand_dimension(fields, dim_new, npw_new, boxl_new):
+    """Convert a field to one of a higher dimension (e.g. 1d to 2d or 3d)
+
+        Args:
+          fields: list of field arguments
+          dim_new (list): new dimension of fields (must be higher than input dimension)
+          npw_new (list): npw for each new dimension created
+          boxl_new (list): box length for each new dimension created
+        
+        Returns:
+          fields_new: a new list of fields with expanded dimension      
+
+    """
 
     assert(type(dim_new) == int), "dim_new must be int"
 

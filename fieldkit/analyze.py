@@ -341,21 +341,18 @@ def _write_Mesh(verts,faces,fileprefix="mesh."):
 def identify_discrete_domains(field, density_threshold):
     ''' Identify all discrete domains present within a field given a density threshold
 
-        Uses the "burning algorithm"
-        Adapted from domaintools.py
-
-        Also sets - image_flags (which PBC a domain belongs to) and 
-                  - isborder (whether a grid is adjacent to a domain)
+        Uses the "burning algorithm". Adapted from domaintools.py
+        Also sets (1) image_flags (which PBC a domain belongs to) and (2) isborder (whether a grid is adjacent to a domain)
         Though these are not currently used outside of this function
 
-    Args:
-        field: field to identify domains of
-        density_threshold: threshold used to define domains
+        Args:
+            field: field to identify domains of
+            density_threshold: threshold used to define domains
 
-    Returns:
-        ndomains: the number of discrete domains 
-        domainID: a ndarray of shape equal to field.data containing the index of that domain. If domainID == 0, it is the continuous domain. Points with domainID == i, correspond to the ith domain
-        imageflags: imageflags in each dimension
+        Returns:
+            ndomains: the number of discrete domains 
+            domainID: a ndarray of shape equal to field.data containing the index of that domain. If domainID == 0, it is the continuous domain. Points with domainID == i, correspond to the ith domain
+            imageflags: imageflags in each dimension
 
     '''
 
