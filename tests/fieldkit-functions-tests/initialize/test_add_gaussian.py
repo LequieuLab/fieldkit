@@ -7,7 +7,7 @@ def test_2d():
     
     #h = np.array([[1,0,0],[0,1,0],[0,0,1]]) 
     h = np.array([[3,0],[0,1]]) 
-    field = fk.Field(npw_Nd = npw, h = h)
+    field = fk.Field(npw = npw, h = h)
     fk.add_gaussian(field, center=(0.0,0.0), sigma=0.10, height=1)
     fk.write_to_file("fields.dat",[field])
 

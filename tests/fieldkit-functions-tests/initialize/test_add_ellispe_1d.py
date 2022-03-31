@@ -4,9 +4,9 @@ from pytest import approx
 def test_all():
     npw = [64]
 
-    field1 = fk.Field(npw_Nd = npw)
-    field2 = fk.Field(npw_Nd = npw)
-    field3 = fk.Field(npw_Nd = npw)
+    field1 = fk.Field(npw = npw)
+    field2 = fk.Field(npw = npw)
+    field3 = fk.Field(npw = npw)
 
     fk.add_ellipse(field1, center=[0.0], axis_lengths=[0.5])
     fk.add_ellipse(field2, center=[0.5], axis_lengths=[0.5])

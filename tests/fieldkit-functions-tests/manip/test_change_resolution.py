@@ -10,7 +10,7 @@ def test_32x32_to_64x64():
     fields = fk.read_from_file(filename)
     new_fields = fk.change_resolution(fields, new_resolution)
 
-    assert(new_fields[0].npw_Nd == (64,64))
+    assert(new_fields[0].npw == (64,64))
 
     assert(approx(new_fields[0].data[0,0], 1e-06) == fields[0].data[0,0])
     assert(approx(new_fields[0].data[0,20], 1e-06) == fields[0].data[0,10])
@@ -25,7 +25,7 @@ def test_32x32_to_64x32():
     fields = fk.read_from_file(filename)
     new_fields = fk.change_resolution(fields, new_resolution)
 
-    assert(new_fields[0].npw_Nd == (64,32))
+    assert(new_fields[0].npw == (64,32))
 
     assert(approx(new_fields[0].data[0,0], 1e-06) == fields[0].data[0,0])
     assert(approx(new_fields[0].data[0,10], 1e-06) == fields[0].data[0,10])

@@ -7,7 +7,7 @@ def test_2d():
     
     #h = np.array([[1,0,0],[0,1,0],[0,0,1]]) 
     h = np.array([[2,0],[0,1]]) 
-    field = fk.Field(npw_Nd = npw, h = h)
+    field = fk.Field(npw = npw, h = h)
     
     # check P=5
     fk.add_hockney_eastwood_function(field, center=(0.0,0.0), P=5, height=1)

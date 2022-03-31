@@ -7,7 +7,7 @@ def test_all():
     fields = fk.read_from_file(filename)
     fields_new = fk.replicate_fields(fields, nreplicates)
  
-    assert(fields_new[0].npw_Nd == (128,128))
+    assert(fields_new[0].npw == (128,128))
 
 
     assert(fields_new[0].data[0,32] == fields[0].data[0,0])

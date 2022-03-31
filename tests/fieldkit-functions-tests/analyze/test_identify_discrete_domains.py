@@ -6,7 +6,7 @@ def test_2d():
     npw = (64,64)
     h = np.array([[3,0],[0,1]]) 
     
-    field = fk.Field(npw_Nd = npw, h=h)
+    field = fk.Field(npw = npw, h=h)
 
     fk.add_gaussian(field, center=(0.0,0.0), sigma = 0.2, height=100)
     fk.add_gaussian(field, center=(0.5,0.5), sigma = 0.2, height=100)
@@ -29,7 +29,7 @@ def test_3d():
     npw = (32,32,32)
     h = np.array([[3,0,0],[0,1,0],[0,0,2]]) 
     
-    field = fk.Field(npw_Nd = npw, h=h)
+    field = fk.Field(npw = npw, h=h)
 
     fk.add_gaussian(field, center=(0.0,0.0,0.0), sigma = 0.2, height=100)
     fk.add_gaussian(field, center=(0.5,0.5,0.0), sigma = 0.2, height=100)

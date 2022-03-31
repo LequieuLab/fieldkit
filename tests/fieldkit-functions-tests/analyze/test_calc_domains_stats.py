@@ -5,7 +5,7 @@ import numpy as np
 def test_2d_cubic():
     npw = (32,32)
     h = np.array([[1,0],[0,1]]) 
-    field = fk.Field(npw_Nd = npw, h=h)
+    field = fk.Field(npw = npw, h=h)
     
     sig = 0.15
     r = np.sqrt(2*np.log(2)) * sig # = half width at half max
@@ -30,7 +30,7 @@ def test_2d_rectangular():
     npw = (32,64)
     h = np.array([[1,0],[0,2]]) 
     
-    field = fk.Field(npw_Nd = npw, h=h)
+    field = fk.Field(npw = npw, h=h)
     
     sig = 0.20
     r = np.sqrt(2*np.log(2)) * sig # = half width at half max
@@ -57,7 +57,7 @@ def test_3d_cubic():
     npw = (32,32,32)
     h = np.array([[2,0,0],[0,2,0],[0,0,2]]) 
     
-    field = fk.Field(npw_Nd = npw, h=h)
+    field = fk.Field(npw = npw, h=h)
 
     sig = 0.20
     r = np.sqrt(2*np.log(2)) * sig # = half width at half max
@@ -83,7 +83,7 @@ def test_3d_orthorhombic():
     npw = (32,32,64)
     h = np.array([[2,0,0],[0,2,0],[0,0,4]]) 
     
-    field = fk.Field(npw_Nd = npw, h=h)
+    field = fk.Field(npw = npw, h=h)
 
     sig = 0.20
     r = np.sqrt(2*np.log(2)) * sig # = half width at half max

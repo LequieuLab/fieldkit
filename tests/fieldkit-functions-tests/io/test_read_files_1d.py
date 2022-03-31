@@ -6,7 +6,7 @@ def test_all():
     fields = fk.read_from_file(filename)
 
     assert(len(fields) ==  2)
-    assert(fields[0].npw_Nd == (64,))
+    assert(fields[0].npw == (64,))
 
     assert(fields[0].data[0] == 0.0036036893)
     assert(fields[0].data[5] == 0.0096679716)
