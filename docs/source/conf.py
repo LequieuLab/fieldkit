@@ -12,7 +12,8 @@
 #
 import os
 import sys
-sys.path.append('~/fieldkit/fieldkit')
+#sys.path.append('~/fieldkit/fieldkit')
+sys.path.append(os.path.abspath("../../"))
 
 
 # -- Project information -----------------------------------------------------
