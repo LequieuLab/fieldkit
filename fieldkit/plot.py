@@ -4,6 +4,7 @@ Functions to plot fields
 
 from .field import *
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 def plot(fields,dpi=100,show=True,filename=None):
   """Plot fields using matplotlib
@@ -77,9 +78,16 @@ def plot(fields,dpi=100,show=True,filename=None):
         from mpl_toolkits.mplot3d import Axes3D
         ax.set_xlabel('x')
         ax.set_ylabel('y')
-        ax.set_zlabel('z')
-        ax.scatter(field.coords[:,:,:,0], field.coords[:,:,:,1],field.coords[:,:,:,2],c=data,cmap='coolwarm')
+        ax.set_zlabel('z',labelpad=0)
+        scatter = ax.scatter(field.coords[:,:,:,0], field.coords[:,:,:,1],field.coords[:,:,:,2],c=data,cmap='coolwarm')
+        
+        # from https://stackoverflow.com/questions/18195758/set-matplotlib-colorbar-size-to-match-graph
+        #divider = make_axes_locatable(ax)
+        #cax = divider.append_axes("right", size="5%", pad=0.05)
+        #cb = fig.colorbar(scatter,cax=cax)
 
+        cb = fig.colorbar(scatter,ax=ax,pad=0.2,shrink=0.5)
+        #cb.set_label('field value')
   plt.tight_layout()
   if filename:
     plt.savefig(filename)
