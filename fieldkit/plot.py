@@ -95,4 +95,6 @@ def plot(fields,dpi=100,show=True,filename=None):
   if show:
     plt.show()
 
+  plt.close()
+
 
