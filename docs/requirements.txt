@@ -2,3 +2,4 @@ nbsphinx
 numpy
 scikit-image
 matplotlib
+ipython
