@@ -6,7 +6,7 @@ from .field import *
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plot(fields,dpi=100,show=True,filename=None):
+def plot(fields,dpi=100,show=True,filename=None,imag=False):
   """Plot fields using matplotlib
     
     Args: 
@@ -14,6 +14,7 @@ def plot(fields,dpi=100,show=True,filename=None):
       dpi: dpi (resolution) of specified image
       show: whether or not to show the plot
       filename: output filename for plotfile
+      imag: whether to plot 'real' or 'imag' component of fields
 
     Returns:
       none
@@ -25,6 +26,7 @@ def plot(fields,dpi=100,show=True,filename=None):
     fields = [fields]
     nfields = len(fields)
   
+
   if nfields == 1:
     nrows = 1; ncols = 1
   elif nfields == 2:
@@ -48,11 +50,17 @@ def plot(fields,dpi=100,show=True,filename=None):
     else:
       ax = fig.add_subplot(nrows,ncols,ifield+1, projection='3d')
 
-    # ignore complex part of data if it exists
+    # grab either the real or imag part of fields (depending on imag input arg)
     if field.is_complex():
-      print(f"Note: not plotting imaginary part of field {ifield}")
-      data = field.data.real
+      if imag == False:
+        print(f"Note: not plotting imaginary part of field {ifield}")
+        data = field.data.real
+      else:
+        print(f"Note: only plotting imaginary part of field {ifield}")
+        data = field.data.imag
     else:
+      if (imag==True):
+        print("Warning: imag set to 'True' but fields are purely real")
       data = field.data
 
     # set title
