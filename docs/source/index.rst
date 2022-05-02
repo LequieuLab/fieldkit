@@ -13,7 +13,7 @@ Quickstart
     * numpy, scipy, matplotlib (for core functionality)
     * pytest (for unit tests)
     * sphinx (for documentation)
-    * mdtraj, gsd, scikit-image, pandas (for some specialized functionality)
+    * mdtraj, gsd, scikit-image, pandas, numba (for some specialized functionality)
     * Paraview (for VTK visualization)
 
 2. Update your `PYTHONPATH` to contain **fieldkit**::

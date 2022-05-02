@@ -402,7 +402,8 @@ def particle_to_field(trjfile, topfile, frames_to_average, npw, P):
     # return field
     return fields
 
-def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False):
+
+def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False, use_jit=True, verbose=True):
     ''' Initialize a field using a the particle coordinates and Hockney/Eastwood function
 
     Args: 
@@ -448,33 +449,55 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False):
       assert(np.all(frame.configuration.box[3:] == 0.0)), "box must be orthorhombic"
 
     # using box size, initialize new fields (one for each type of atom)
-    print(f"Creating {natomtypes} fields for {natomtypes} found atom types")
+    if verbose:
+      print(f"Creating {natomtypes} fields for {natomtypes} found atom types")
+    npw = np.array(npw) # cast npw as np.array (helped with numba)
     fields = []
     for itype in range(natomtypes):
       fields.append(Field(npw = npw, h=h))
 
+    if use_jit:
+      data_array = np.zeros([natomtypes] + list(npw))
+      for itype in range(natomtypes):
+        data_array[itype] = fields[itype].data # TODO: check if this is copy by ref or value
+
     for frame_index in frames_to_average:
-      print(f"Processing frame {frame_index} containing {frame.particles.N} atoms")
+      if verbose:
+        print(f"Processing frame {frame_index} containing {frame.particles.N} atoms")
       # find specified frame
       frame = t[frame_index] 
 
-      # loop through all particles in frame and call add_gaussian function
-      for iatom in range(frame.particles.N):
-          myP = P # all atom types currently use same sigma. Should be able to generalize...
-          pos = frame.particles.position[iatom]
-          atomtype_index = frame.particles.typeid[iatom]
+      myP = P # all atom types currently use same sigma. Should be able to generalize...
 
-          # TODO: calling this function within a double for-loop over particles and frames is killing performance
-          #       it would be worth thinking about a more efficient implementation
-          # initial idea: try pybinding this function or numba?
-          add_hockney_eastwood_function(fields[atomtype_index], center=pos, P=myP, height=1)
-          
-          # TODO: in principle it should be possible to also initialize using Gaussians
-          # however add_gaussians function currently searches over all grid points which makes it much to slow
-          #add_gaussian(field, center=pos, sigma=mysigma, height=1)
+      if use_jit:
+        positions = frame.particles.position
+        types = frame.particles.typeid
+       
+        # function optimized for numba that contains loop over atoms (should be much faster than naive implementation)
+        jit_add_hockney_eastwood_functions(data_array, npw, h, positions, types, P=myP, height=1)
+
+      else:
+        # loop through all particles in frame and call add_gaussian function
+        for iatom in range(frame.particles.N):
+            pos = frame.particles.position[iatom]
+            atomtype_index = frame.particles.typeid[iatom]
+
+            # TODO: calling this function within a double for-loop over particles and frames is killing performance
+            #       it would be worth thinking about a more efficient implementation
+            # initial idea: try pybinding this function or numba?
+            add_hockney_eastwood_function(fields[atomtype_index], center=pos, P=myP, height=1)
+            
+            # TODO: in principle it should be possible to also initialize using Gaussians
+            # however add_gaussians function currently searches over all grid points which makes it much to slow
+            #add_gaussian(field, center=pos, sigma=mysigma, height=1)
     
     # fields contain total over ALL frames, need to compute average
-    for field in fields:
+    for ifield, field in enumerate(fields):
+
+      # copy back from data_array into fields
+      if use_jit:
+        field.data = data_array[ifield]
+
       field.data /= nframes_to_average
       if normalize:
         field.data /= rho0 # I'm not sure if this normalization is quite right...seems to work reasonably though...
@@ -487,6 +510,8 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False):
     return fields
 
 
+from numba import jit
+@jit(nopython=True) 
 def add_hockney_eastwood_function(field,center, P, height = 1):
     ''' add a Hockney Eastwood function of order P to field
 
@@ -504,12 +529,12 @@ def add_hockney_eastwood_function(field,center, P, height = 1):
     center = np.array(center) # recast center to array
     
     # box must be orthorhombic
-    assert(field.is_orthorhombic()), f"Error: h must be orthorhombic in add_gaussian function. {h}"
+    assert(field.is_orthorhombic()) #, f"Error: h must be orthorhombic in add_gaussian function. {h}"
     boxl = np.diag(h)
     
     # voxels must be cubic 
     grid_spacings = np.diag(h) / npw # since field is orthorhombic, gridspacings will be of length dim
-    assert (np.allclose(grid_spacings, grid_spacings[0],atol=1e-2)), f"voxels must be cubic {grid_spacings = }"
+    assert (np.allclose(grid_spacings, grid_spacings[0],atol=1e-2)) #, "voxels must be cubic grid_spacings = {}".format(grid_spacings)
 
     
     xparticle = center / boxl * npw # xparticle should be in range [0,npw)
@@ -528,13 +553,91 @@ def add_hockney_eastwood_function(field,center, P, height = 1):
    
     data = np.zeros(npw)
     for i,index in enumerate(grid_indicies):
+        index = tuple(index)
         data[index] += weights[i]
 
     # now add to field
     field.data += data
 
+@jit(nopython=True) 
+def jit_add_hockney_eastwood_functions(data_array, npw, h, centers, types, P, height = 1):
+    ''' Add a Hockney Eastwood function of order P to field (numba/jit implementation)
 
+        This is basically a C-like restructured version of add_hockney_eastwood_function to avoid having to 
+        explicitly use a Field object (which numba does not like since it cannot determine its type). 
+        This function now explicitly loops over all particle centers. Simple benchmarking shows that this was
+        about 100x faster over my initial python only implementation
+
+    Args: 
+        data_array: np.arrays of size ntypes*npw with the data that should be updated (note: updated IN PLACE)
+        npw: number of grid points in each dimension
+        h: cell tensor matrix (dim x dim)
+        centers: particles centers to place H-E functions at and add to data_list 
+        types: type of each particle
+        P: order of assignment function
+        height: total integral of function TODO: probably better to rename this from "height" to something else
+        
+    '''
+
+    ndata = data_array.shape[0]
+    ncenters = centers.shape[0]
+    assert(ncenters == types.shape[0]) # there should be one type per center
+    dim = centers.shape[1]
+    assert (dim >= 1 and dim <= 3) # check dimension
+
+    #npw = np.array(npw)
+
+    # confirm that h is orthorhombic by checking that upper and lower diag are zero
+    diag = np.diag(np.diag(h)) # this is a 2d matrix with all offdiag = 0
+    nondiag = h - diag # 2d matrix with diagonal elements = 0
+    zero_nondiag = np.all(nondiag ==0.0)
+    assert(zero_nondiag) # h is not orthorhombic
+
+    boxl = np.diag(h)
+
+    # voxels must be cubic 
+    grid_spacings = np.divide(boxl,npw) # since field is orthorhombic, gridspacings will be of length dim
+    for i in range(1,len(grid_spacings)):
+      assert (abs(grid_spacings[i]-grid_spacings[0]) < 1e-2) #, "voxels must be cubic grid_spacings = {}".format(grid_spacings)
+
+    # loop over all centers and update data_array
+    for icenter in range(ncenters):
+      center = centers[icenter] 
+      mytype = types[icenter]
+      assert(mytype >= 0 and mytype < data_array.shape[0]) # data_array should have length = number of types
+
+      xparticle = center / boxl * npw # xparticle should be in range [0,npw)
+
+      # apply PBC to xparticle
+      for idim in range(dim):
+          while xparticle[idim] <  0:         xparticle[idim] += npw[idim]
+          while xparticle[idim] >= npw[idim]: xparticle[idim] -= npw[idim]
+      
+      # generate a single hockney eastwood function
+      grid_indicies, weights = hockney_eastwood_function(xparticle, npw, P)
+
+      # update data list
+      for i,index in enumerate(grid_indicies):
+        # numba doesn't like tuple indexing
+        #index = tuple(index)
+        #data_list[mytype][index] += weights[i]
+        if dim == 1:
+          x = index[0]
+          data_array[mytype][x] += weights[i]
+        elif dim == 2:
+          x = index[0]
+          y = index[1]
+          data_array[mytype][x,y] += weights[i]
+        else: # dim == 3
+          x = index[0]
+          y = index[1]
+          z = index[2]
+          data_array[mytype][x,y,z] += weights[i]
+
+    # note: edits are made to data_array in place. No need to return
     
+    
+@jit(nopython=True) 
 def hockney_eastwood_function(xparticle, ngridpts, P):
     ''' Hockney-Eastwood Function as described in Deserno and Holm 1998
 
@@ -551,41 +654,88 @@ def hockney_eastwood_function(xparticle, ngridpts, P):
     dim = len(xparticle)
     assert(dim >= 1 and dim <= 3) 
     
-    grid_indicies_per_dim = [[]]*dim # blank 2d list, len(1) == dim, len(2) == unspecified
+    #grid_indicies_per_dim = [[]]*dim # blank 2d list, len(1) == dim, len(2) == unspecified. Old -- using lists
+    grid_indicies_per_dim = np.zeros((dim,P)) # New -- using numpy
     weights_per_dim = np.zeros((dim,P))
 
     for idim in range(dim): 
+      # ------------------------------------
+      # initial version using lists
+      # ------------------------------------
+      ## set xbar
+      #if ((P % 2) == 0): # P is even
+      #  # set xbar as midpoint of nearest two mesh points
+      #  if np.floor(xparticle[idim]) != np.ceil(xparticle[idim]): 
+      #    xbar = 0.5*(np.floor(xparticle[idim]) + np.ceil(xparticle[idim]))
+      #    grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))]
+      #    nelem = 2
+      #  else: # check for edge case if xparticle is exactly an integer (so floor and ceil are equal)
+      #    xbar = 0.5*(np.floor(xparticle[idim]) + np.ceil(xparticle[idim]) + 1) # use higher grid index, it wont matter since its weight will be ~0
+      #    grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))+1] # should the 2nd entry be np.floor instead?
+      #    nelem = 2
+      #else: # P is odd
+      #  # set xbar as location of nearest mesh point
+      #  xbar = np.round(xparticle[idim])
+      #  grid_indicies_per_dim[idim] = [int(xbar)]
+      #  nelem = 1
 
+      ## now find the indicies of the P closest mesh points
+      #while (len(grid_indicies_per_dim[idim]) < P):
+      #  idx_down = grid_indicies_per_dim[idim][0] - 1
+      #  idx_up = grid_indicies_per_dim[idim][-1] + 1
+      #  grid_indicies_per_dim[idim].insert(0,idx_down) # add to beginning
+      #  grid_indicies_per_dim[idim].append(idx_up)     # add to end
+      #  nelem += 2
+
+      #grid_indicies_per_dim[idim] = np.array(grid_indicies_per_dim[idim],dtype=np.int64)
+      #
+      ## grid_indicies should be an ascending sequence of integers
+      #assert(len(grid_indicies_per_dim[idim]) == P)
+ 
+
+      # --------------------------------------------------------------------
+      # new version using numpy arrays (to hopefully work better with numba)
+      # --------------------------------------------------------------------
       # set xbar
       if ((P % 2) == 0): # P is even
+        ilo = int(P/2-1) #index of current lowest populated point
+        ihi = int(P/2)   #index of current highest populated point
         # set xbar as midpoint of nearest two mesh points
         if np.floor(xparticle[idim]) != np.ceil(xparticle[idim]): 
           xbar = 0.5*(np.floor(xparticle[idim]) + np.ceil(xparticle[idim]))
-          grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))]
+          #grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))] # old -- list
+          grid_indicies_per_dim[idim][ilo] = int(np.floor(xbar)) # new numpy
+          grid_indicies_per_dim[idim][ihi] = int(np.ceil(xbar)) # new numpy
           nelem = 2
         else: # check for edge case if xparticle is exactly an integer (so floor and ceil are equal)
           xbar = 0.5*(np.floor(xparticle[idim]) + np.ceil(xparticle[idim]) + 1) # use higher grid index, it wont matter since its weight will be ~0
-          grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))+1] # should the 2nd entry be np.floor instead?
+          #grid_indicies_per_dim[idim] = [int(np.floor(xbar)), int(np.ceil(xbar))+1] # should the 2nd entry be np.floor instead? # old -- list
+          grid_indicies_per_dim[idim][ilo] = int(np.floor(xbar)) # new: numpy
+          grid_indicies_per_dim[idim][ihi] = int(np.ceil(xbar))+1 # new: numpy
           nelem = 2
       else: # P is odd
+        ilo = int(P/2)   #index of current lowest populated point
+        ihi = int(P/2)   #index of current highest populated point (same since P=odd)
         # set xbar as location of nearest mesh point
         xbar = np.round(xparticle[idim])
-        grid_indicies_per_dim[idim] = [int(xbar)]
+        #grid_indicies_per_dim[idim] = [int(xbar)] # old: list
+        grid_indicies_per_dim[idim][ilo] = int(xbar) # new numpy
         nelem = 1
 
       # now find the indicies of the P closest mesh points
-      while (len(grid_indicies_per_dim[idim]) < P):
-        idx_down = grid_indicies_per_dim[idim][0] - 1
-        idx_up = grid_indicies_per_dim[idim][-1] + 1
-        grid_indicies_per_dim[idim].insert(0,idx_down) # add to beginning
-        grid_indicies_per_dim[idim].append(idx_up)     # add to end
+      loop_index = 1
+      while (nelem < P):
+        idx_down = grid_indicies_per_dim[idim][ilo] - 1
+        idx_up = grid_indicies_per_dim[idim][ihi] + 1
+        grid_indicies_per_dim[idim][ilo-1] = idx_down # add to beginning
+        grid_indicies_per_dim[idim][ihi+1] = idx_up   # add to end
         nelem += 2
+        ilo -= 1 
+        ihi += 1
+
+      # ------------------------------------------------------------------
      
-      grid_indicies_per_dim[idim] = np.array(grid_indicies_per_dim[idim],dtype=np.int64)
-      
-      # grid_indicies should be an ascending sequence of integers
-      assert(len(grid_indicies_per_dim[idim]) == P)
-      
+     
       # apply PBCs (but don't change order)
       for i in range(P):
         while grid_indicies_per_dim[idim][i] < 0:               grid_indicies_per_dim[idim][i] += ngridpts[idim]
@@ -617,20 +767,64 @@ def hockney_eastwood_function(xparticle, ngridpts, P):
       else:
         raise RuntimeError ("Invalid P")
     
-    # noW need to find all combinations of grid_indicies and weights     
-    grid_indicies = []
-    weights = []
-    
-    # by using np.ndindex, this should work for any dimension
-    shape_Pdim = tuple([P]*dim)
-    for i_Pdim in np.ndindex(shape_Pdim):
-        index_Nd = []
-        weight = 1.0
-        for idim in range(dim):
-            index_Nd.append(grid_indicies_per_dim[idim][i_Pdim[idim]])
-            weight *= weights_per_dim[idim][i_Pdim[idim]]
-        grid_indicies.append(tuple(index_Nd))
-        weights.append(weight)
+    # now need to find all combinations of grid_indicies and weights     
+    # old -- did not work with numba 
+    #grid_indicies = []
+    #weights = []
+    ## by using np.ndindex, this should work for any dimension
+    #shape_Pdim = tuple([P]*dim)
+    #for i_Pdim in np.ndindex(shape_Pdim):
+    #    index_Nd = []
+    #    weight = 1.0
+    #    for idim in range(dim):
+    #        index_Nd.append(int(grid_indicies_per_dim[idim][i_Pdim[idim]]))
+    #        weight *= weights_per_dim[idim][i_Pdim[idim]]
+    #    grid_indicies.append(tuple(index_Nd))
+    #    weights.append(weight)
+    #print(grid_indicies) 
+    #print(weights) 
+
+    grid_indicies = np.zeros((P**dim,dim),dtype=np.int32) 
+    weights = np.zeros((P**dim)) 
+    # new -- hopefully work with numba
+    index = 0
+
+    # I had trouble getting generic implementation for d-dimensions to compile with numba
+    #Pdim = np.zeros([P]*dim, dtype=np.int32)
+    #for i_Pdim in np.ndindex(Pdim.shape):
+    #    weight = 1.0
+    #    for idim in range(dim):
+    #        grid_indicies[index][idim] = grid_indicies_per_dim[idim][i_Pdim[idim]]
+    #        weight *= weights_per_dim[idim][i_Pdim[idim]]
+    #    weights[index] = weight
+    #    index += 1
+
+    if dim == 1:
+      for i_Pdim in np.ndindex((P)):
+          weight = 1.0
+          for idim in range(dim):
+              grid_indicies[index][idim] = grid_indicies_per_dim[idim][i_Pdim[idim]]
+              weight *= weights_per_dim[idim][i_Pdim[idim]]
+          weights[index] = weight
+          index += 1
+    elif dim == 2:
+      for i_Pdim in np.ndindex((P,P)):
+          weight = 1.0
+          for idim in range(dim):
+              grid_indicies[index][idim] = grid_indicies_per_dim[idim][i_Pdim[idim]]
+              weight *= weights_per_dim[idim][i_Pdim[idim]]
+          weights[index] = weight
+          index += 1
+    elif dim == 3:
+      for i_Pdim in np.ndindex((P,P,P)):
+          weight = 1.0
+          for idim in range(dim):
+              grid_indicies[index][idim] = grid_indicies_per_dim[idim][i_Pdim[idim]]
+              weight *= weights_per_dim[idim][i_Pdim[idim]]
+          weights[index] = weight
+          index += 1
+    #print(grid_indicies) 
+    #print(weights) 
         
     return grid_indicies,weights
 
