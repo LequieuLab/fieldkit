@@ -32,16 +32,30 @@ def plot(fields,dpi=100,show=True,filename=None,imag=False):
   elif nfields == 2:
     nrows = 1; ncols = 2
   elif nfields == 3:
-    nrows = 1; ncols = 2
+    nrows = 1; ncols = 3
   elif nfields == 4:
     nrows = 2; ncols = 2
   else:
-    raise RuntimeError("nfields > 4 not currently supported")
+    # try to factor
+    #nrows = 6
+    #while (nfields % nrows != 0): 
+    #  nrows -= 1
+    #ncols = int(nfields / nrows)
+
+    # force square
+    nrows = int(np.ceil(nfields **0.5))
+    ncols = int(np.ceil(nfields **0.5))
+    print(f"Automatically set {nrows = }, {ncols = }")
+  #else:
+  #  raise RuntimeError("nfields > 4 not currently supported")
  
   fig = plt.figure(figsize=(ncols*3.33,nrows*3.33),dpi=dpi)
 
+  breakpoint()
   for i in np.ndindex(nrows,ncols):
-    ifield = i[0]*ncols + i[1]*nrows
+    ifield = i[0]*ncols + i[1]
+    if ifield >= nfields:
+      continue
     field = fields[ifield]
 
     # create new axis for plot
