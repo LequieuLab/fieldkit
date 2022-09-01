@@ -51,7 +51,6 @@ def plot(fields,dpi=100,show=True,filename=None,imag=False):
  
   fig = plt.figure(figsize=(ncols*3.33,nrows*3.33),dpi=dpi)
 
-  breakpoint()
   for i in np.ndindex(nrows,ncols):
     ifield = i[0]*ncols + i[1]
     if ifield >= nfields:
