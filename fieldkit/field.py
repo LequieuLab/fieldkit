@@ -70,8 +70,23 @@ class Field:
             return True 
         else:
             return False
-        
+
+    def is_cubic(self):
+      ''' is cell of this field cubic or not '''
+      if not self.is_orthorhombic():
+        return False
+      else:
+        h_diag = np.diag(self.h)
+        all_sides_equal = True
+        for idim in range(self.dim):
+          for jdim in range(self.dim):
+            if h_diag[idim] != h_diag[jdim]:
+              all_sides_equal = False
+        return all_sides_equal
+
+          
     def volume(self):
+      ''' calculate volume of cell tensor '''
       return np.linalg.det(self.h)
 
     def set_h(self,h):

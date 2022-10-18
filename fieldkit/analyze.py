@@ -336,8 +336,6 @@ def _write_Mesh(verts,faces,fileprefix="mesh."):
     
 
 
- 
-
 def identify_discrete_domains(field, density_threshold):
     ''' Identify all discrete domains present within a field given a density threshold
 
@@ -512,4 +510,12 @@ def _pbc_domain_locs(field, idomain,regionID, image_flags, local_com):
         extra_com.append(new_com)
         num_extra = len(extra_com)
     return extra_com
+
+
+   
+      
+
+
+
+
 

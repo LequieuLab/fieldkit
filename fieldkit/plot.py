@@ -100,6 +100,8 @@ def plot(fields,dpi=100,show=True,filename=None,imag=False):
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.set_zlabel('z',labelpad=0)
+        #ax.axis('equal') # not supported
+        
         scatter = ax.scatter(field.coords[:,:,:,0], field.coords[:,:,:,1],field.coords[:,:,:,2],c=data,cmap='coolwarm')
         
         # from https://stackoverflow.com/questions/18195758/set-matplotlib-colorbar-size-to-match-graph

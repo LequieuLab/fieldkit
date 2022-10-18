@@ -285,3 +285,47 @@ def expand_dimension(fields, dim_new, npw_new, boxl_new):
 
     return fields_new
 
+
+def compress_dimension(fields, dims_to_compress):
+    """Convert a field to one of a lower dimension (e.g. 1d to 2d or 3d)
+
+        Args:
+          fields: list of field arguments
+          dims_to_compress (list): dimensions to compress
+        
+        Returns:
+          fields_new: a new list of fields with compressed dimension      
+
+
+    """
+
+    # if single entry, convert to list
+    if type(fields) == Field:
+      fields = [fields]
+    elif type(fields) == list:
+      pass
+    else:
+      raise TypeError(f"Invalid type of fields {type(fields) = }")
+
+
+    # now compress each field
+    fields_new = []
+    for field in fields:
+      assert(field.is_orthorhombic), "compress_dimension requires fields to be orthorhombic"
+
+      # extract npw and h from preserved dimensions
+      npw = []
+      h_diag = []
+      for idim in range(field.dim):
+        if not (idim in dims_to_compress):
+          h_diag.append(field.h[idim,idim])
+          npw.append(field.npw[idim])
+      h = np.diag(h_diag) 
+
+      # average data along dims to compress 
+      data = np.average(field.data, axis=tuple(dims_to_compress))
+
+      # create new field
+      fields_new.append(Field(npw=npw, h=h, data=data))
+
+    return fields_new

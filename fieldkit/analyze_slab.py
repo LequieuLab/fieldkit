@@ -137,13 +137,11 @@ def _slab_estimate_grid_index_and_volume_of_phases(field, interface_scale=1.0):
         is_phaseI = True
       elif i == idx_interface_right:
         is_phaseI = False
-
+    
+    # package data for output
     idx_of_phases = [idx_phaseI, idx_phaseII]
     vol_of_phases = [volI, volII] # normalized volumes (they should sum to one)
    
-    
-    # now compute volume of each phase
- 
     # plotting  -- for debugging
     #import matplotlib.pyplot as plt
     #plt.plot(x,y) 

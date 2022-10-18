@@ -7,6 +7,7 @@ from .fileio import *
 from .manipulate import *
 from .initialize import *
 from .analyze import *
+from .analyze_slab import *
 from .plot import *
 
 #from field_io import field_io
