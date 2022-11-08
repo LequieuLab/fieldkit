@@ -72,16 +72,47 @@ def _slab_estimate_grid_index_and_volume_of_phases(field, interface_scale=1.0):
     assert(field.dim == 1), "fields must be 1 dimensional"
     Lx = field.h[0,0] 
     M = field.npw[0]
-    x = field.coords
-    y = field.data
+    x = field.coords.real # only use real 
+    y = field.data.real # only use real 
     
     # compute derivative using splines 
     tck = scipy.interpolate.splrep(x,y)
     dydx = scipy.interpolate.splev(x, tck, der=1)
 
+    # Below I will follow the following convention when I say "left" and "right"
+    # "left" is MAX of deriv (i.e. where density is increasing INTO slab)
+    # "right" is MIN of deriv (i.e. where density is decreasing OUT OF slab)
+    #
+    #    ^ 
+    #    |              _______                
+    # y  |             /       \
+    #    | phaseII    / phaseI  \  phaseII
+    #    |           /           \             
+    #    | ----------             ---------  
+    #    |           ^           ^           
+    #    |          LEFT        RIGHT        
+    #     ------------------------------------>
+    #                                         x
+    #
+    # Due to PBCs, sometimes "left" will not appear on the left. e.g
+    #    ^ 
+    #    |____                         ___
+    # y  |    \                       /   
+    #    | pI  \      phaseII        /  phaseI
+    #    |      \                   /     
+    #    |       -------------------      
+    #    |     ^                      ^   
+    #    |    RIGHT                  LEFT 
+    #     ------------------------------------>
+    #                                         x
+    # 
+    # this situation is accounted for below. These sketches are mostly in case I 
+    # need to debug this function in the future...
+
+    
     # find interface using the max and min of 1st deriv
-    idx_interface_left = dydx.argmax()
-    idx_interface_right = dydx.argmin()
+    idx_interface_left = dydx.argmax()  # note: "left" convention above
+    idx_interface_right = dydx.argmin() # note: "right" convention above
     
     # calculate center of phaseI (used to normalize interface widths)
     # shift right idx by PBC until it is actually on the right
@@ -127,7 +158,9 @@ def _slab_estimate_grid_index_and_volume_of_phases(field, interface_scale=1.0):
       while (dx_right <  0.5*Lx): dx_right += Lx # apply min image convention
       while (dx_right >= 0.5*Lx): dx_right -= Lx
       dx_right = abs(dx_right) # then take abs value (this makes it invariant to phaseI/II)
-
+      
+      # technically I could use HALF the interface width here, but using the entire interface width
+      # on both sides of the interface is more conservative
       if dx_right > width_interface_right and dx_left > width_interface_left :
         if is_phaseI:
           idx_phaseI[i] = True
