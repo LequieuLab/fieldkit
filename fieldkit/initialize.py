@@ -532,7 +532,7 @@ def add_hockney_eastwood_function(field,center, P, height = 1):
     
     # voxels must be cubic 
     grid_spacings = np.diag(h) / npw # since field is orthorhombic, gridspacings will be of length dim
-    assert (np.allclose(grid_spacings, grid_spacings[0],atol=1e-2)) #, "voxels must be cubic grid_spacings = {}".format(grid_spacings)
+    assert (np.allclose(grid_spacings, grid_spacings[0],atol=5e-2)) #, "voxels must be cubic grid_spacings = {}".format(grid_spacings)
 
     
     xparticle = center / boxl * npw # xparticle should be in range [0,npw)
@@ -597,7 +597,7 @@ def add_hockney_eastwood_functions_jit(data_array, npw, h, centers, types, P, he
     # voxels must be cubic 
     grid_spacings = np.divide(boxl,npw) # since field is orthorhombic, gridspacings will be of length dim
     for i in range(1,len(grid_spacings)):
-      assert (abs(grid_spacings[i]-grid_spacings[0]) < 1e-2) #, "voxels must be cubic grid_spacings = {}".format(grid_spacings)
+      assert (abs(grid_spacings[i]-grid_spacings[0]) < 5e-2) #, "voxels must be cubic grid_spacings = {}".format(grid_spacings)
 
     # loop over all centers and update data_array
     for icenter in range(ncenters):
