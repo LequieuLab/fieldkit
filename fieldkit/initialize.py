@@ -403,7 +403,7 @@ def particle_to_field(trjfile, topfile, frames_to_average, npw, P):
     return fields
 
 
-def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False, use_jit=True, verbose=True):
+def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, types=[], normalize=False, use_jit=True, verbose=True):
     ''' Initialize a field using a the particle coordinates and Hockney/Eastwood function
 
     Args: 
@@ -411,7 +411,10 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False, u
         frames_to_average: frame indicies to average over when converting to field. list, or int (if single frame)
         npw: dimension of grid for output field (note that the voxels must be approx. cubic to use current Hockney-Eastwood mapping function
         P: order of Hockney-Eastwood assignment function (see Deserno and Holm 1998 for more details)
+        types: a list/array of length nparticles that will be used ot generate each field. If unspecified, will use atomtypes from the gsd file.
         normalize: whether or not to normalize densities by rho0
+        use_jit: whether or not to use fast numba just-in-time compiled version. This should be enabled if possible.
+        verbose: write lots of output
     '''
 
     # open trajectory using gsd
@@ -426,9 +429,16 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False, u
     # extract useful parameters from first frame (e.g. atomtypes, cell size, etc)
     # WARNING: assumes that all atom types are present in 1st frame
     frame = t[frames_to_average[0]]
+    
+    if len(types) != 0: 
+        types = np.array(types) # force types to be array (helpes with numba)
+        types_list = np.unique(types) # gets number of unique elements in types
+    else: 
+        # default to use atomtypes as types
+        types = frame.particles.typeid
+        types_list = frame.particles.types
 
-    atomtypes_list = frame.particles.types
-    natomtypes = len(atomtypes_list)
+    ntypes = len(types_list)
     boxl = frame.configuration.box[0:3]
     h = np.diag(boxl) # cell size of first frame
     assert(np.all(frame.configuration.box[3:] == 0)), "Cell must be orthorhombic"
@@ -450,7 +460,7 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False, u
 
     # using box size, initialize new fields (one for each type of atom)
     if verbose:
-      print(f"Creating {natomtypes} fields for {natomtypes} found atom types")
+      print(f"Creating {ntypes} fields for {ntypes} found types")
     npw = np.array(npw) # cast npw as np.array (helped with numba)
   
     particles_per_voxel = natoms / np.prod(npw) 
@@ -458,12 +468,12 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False, u
       print(f"WARNING: number of particles per voxel is < 10 ({particles_per_voxel}). The generated fields will likely be noisy.")
 
     fields = []
-    for itype in range(natomtypes):
+    for itype in range(ntypes):
       fields.append(Field(npw = npw, h=h))
 
     if use_jit:
-      data_array = np.zeros([natomtypes] + list(npw))
-      for itype in range(natomtypes):
+      data_array = np.zeros([ntypes] + list(npw))
+      for itype in range(ntypes):
         data_array[itype] = fields[itype].data # TODO: check if this is copy by ref or value
 
     for frame_index in frames_to_average:
@@ -476,7 +486,6 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, normalize=False, u
 
       if use_jit:
         positions = frame.particles.position
-        types = frame.particles.typeid
        
         # function optimized for numba that contains loop over atoms (should be much faster than naive implementation)
         add_hockney_eastwood_functions_jit(data_array, npw, h, positions, types, P=myP, height=1)
@@ -572,7 +581,7 @@ def add_hockney_eastwood_functions_jit(data_array, npw, h, centers, types, P, he
         npw: number of grid points in each dimension
         h: cell tensor matrix (dim x dim)
         centers: particles centers to place H-E functions at and add to data_list 
-        types: type of each particle
+        types: type of each particle. All particles of same type will be grouped into same field
         P: order of assignment function
         height: total integral of function TODO: probably better to rename this from "height" to something else
         

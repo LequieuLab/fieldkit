@@ -3,7 +3,7 @@ from pytest import approx
 import numpy as np
 import json
 
-def test_micelle_3d():
+def test_micelle_3d_by_species():
     npw = (16,16,16)
     
     gsdfile = "./initialize/micelle/micelle.gsd"
@@ -11,11 +11,29 @@ def test_micelle_3d():
     P = 2
     fields = fk.particle_to_field_gsd(gsdfile, frame_index, npw, P, normalize=True)
 
-    fk.write_to_file("fields.dat",fields)
-    fk.write_to_VTK("fields.vtk",fields)
+    fk.write_to_file("fields_species.dat",fields)
+    fk.write_to_VTK("fields_species.vtk",fields)
     
     # FIXME add tests
     assert(True)
+
+def test_micelle_3d_by_molecule():
+    npw = (16,16,16)
+    
+    gsdfile = "./initialize/micelle/micelle.gsd"
+    frame_index = -1 # use last frame
+    P = 2
+    types = np.zeros(100000,dtype=int) # hardcoded 1e5 atoms in micelle.gsd
+    types[14999:] = 1 # first 1207 atoms are polymers (moltype=0), rest are solvent (moltype=1)
+    fields = fk.particle_to_field_gsd(gsdfile, frame_index, npw, P, types = types, normalize=True)
+
+    fk.write_to_file("fields_molecule.dat",fields)
+    fk.write_to_VTK("fields_molecule.vtk",fields)
+    
+    # FIXME add tests
+    assert(True)
+
+
 
 def test_lam_3d():
     #npw = (32,32,32)
@@ -50,6 +68,7 @@ def test_lam_3d():
     # add other tests
 
 if __name__ == "__main__":
-    #test_micelle_3d()
-    test_lam_3d()
+    test_micelle_3d_by_molecule()
+    #test_micelle_3d_by_species()
+    #test_lam_3d()
 
