@@ -465,7 +465,7 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, types=[], normaliz
   
     particles_per_voxel = natoms / np.prod(npw) 
     if particles_per_voxel < 5:
-      print(f"WARNING: number of particles per voxel is < 10 ({particles_per_voxel}). The generated fields will likely be noisy.")
+      print(f"WARNING: number of particles per voxel {particles_per_voxel:.2f} < 10. The generated fields will likely be noisy.")
 
     fields = []
     for itype in range(ntypes):
@@ -513,7 +513,8 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, types=[], normaliz
 
       field.data /= nframes_to_average
       if normalize:
-        field.data /= rho0 # I'm not sure if this normalization is quite right...seems to work reasonably though...
+        field.data /= particles_per_voxel 
+        #field.data /= rho0 # I'm not sure if this normalization is quite right...seems to work reasonably though...
 
     # return field
     return fields

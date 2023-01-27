@@ -3,7 +3,7 @@ from .manipulate import compress_dimension
 import numpy as np
 import scipy.interpolate
 
-def binodal_from_slab(fields, field_idx_for_interfaces=1, interface_scale=1.0):
+def binodal_from_slab(fields, field_idx_for_interfaces=1, interface_scale=1.0, plot=False):
     ''' Tool to estimate phase coexistance from a slab-like simulation
         given fields estimate binodal compositions and volumes of each phase 
 
@@ -32,16 +32,25 @@ def binodal_from_slab(fields, field_idx_for_interfaces=1, interface_scale=1.0):
     # now find different phases and their volumes
     # ----------------------------------------------
     field = fields_1d[field_idx_for_interfaces]
-    idx_of_phases, vol_of_phases = _slab_estimate_grid_index_and_volume_of_phases(field,interface_scale)
+    idx_of_phases, vol_of_phases = _slab_estimate_grid_index_and_volume_of_phases(field,interface_scale, plot=plot)
 
 
     # ---------------------------------------------------
     # calculate average density of each phase and return
     # ---------------------------------------------------
-
+    
     state = {} 
     nmolecules = len(fields_1d)
     nphases = len(idx_of_phases)
+
+    # check if slab is valid
+    valid_slab = True
+    min_phase_width = 3 # width in data points, this helps exclude frames that have hotspots
+    for idx_of_phase in idx_of_phases:
+        if sum(idx_of_phase) < min_phase_width:
+            valid_slab = False
+    if not valid_slab:
+        raise RuntimeError("Error when calculating binodal from slab, one of the phases is too narrow")
 
     # set nu (the relative volume of each phase)    
     state['nu'] = []
@@ -57,6 +66,7 @@ def binodal_from_slab(fields, field_idx_for_interfaces=1, interface_scale=1.0):
       idx = idx_of_phases[iphase]
       sum_phi = 0
       for imol in range(nmolecules):
+        # FIXME: this is where runtime warnings and NANs come from
         phi = np.average(fields_1d[imol].data[idx].real)
         sum_phi += phi
         state[f'phi_{imol}'][iphase] = phi # average over idx of each phase
@@ -67,7 +77,7 @@ def binodal_from_slab(fields, field_idx_for_interfaces=1, interface_scale=1.0):
       
     return state 
 
-def _slab_estimate_grid_index_and_volume_of_phases(field, interface_scale=1.0):
+def _slab_estimate_grid_index_and_volume_of_phases(field, interface_scale=1.0, plot=False):
     # load useful values
     assert(field.dim == 1), "fields must be 1 dimensional"
     Lx = field.h[0,0] 
@@ -96,13 +106,13 @@ def _slab_estimate_grid_index_and_volume_of_phases(field, interface_scale=1.0):
     #
     # Due to PBCs, sometimes "left" will not appear on the left. e.g
     #    ^ 
-    #    |____                         ___
-    # y  |    \                       /   
-    #    | pI  \      phaseII        /  phaseI
-    #    |      \                   /     
-    #    |       -------------------      
-    #    |     ^                      ^   
-    #    |    RIGHT                  LEFT 
+    #    |______                         ______
+    # y  |      \                       /   
+    #    |phaseI \      phaseII        / phaseI
+    #    |        \                   /     
+    #    |         -------------------      
+    #    |       ^                      ^   
+    #    |      RIGHT                  LEFT 
     #     ------------------------------------>
     #                                         x
     # 
@@ -174,17 +184,27 @@ def _slab_estimate_grid_index_and_volume_of_phases(field, interface_scale=1.0):
     # package data for output
     idx_of_phases = [idx_phaseI, idx_phaseII]
     vol_of_phases = [volI, volII] # normalized volumes (they should sum to one)
-   
+  
     # plotting  -- for debugging
-    #import matplotlib.pyplot as plt
-    #plt.plot(x,y) 
-    #plt.plot(x[idx_center_phaseI],y[idx_center_phaseI],label='centerI',marker='*',ms=10) 
-    #plt.plot(x[idx_center_phaseII],y[idx_center_phaseII],label='centerII',marker='*',ms=10) 
-    #plt.plot(x[idx_phaseI],y[idx_phaseI],marker='.',ls='',label='I') 
-    #plt.plot(x[idx_phaseII],y[idx_phaseII],marker='.',ls='',label='II') 
-    #plt.plot(x,dydx,marker='.', label='derivative') 
-    #plt.legend()
-    #plt.show()
+    if plot:
+      import matplotlib.pyplot as plt
+      import matplotlib
+      #matplotlib.use('Agg') # use different backend to avoid picotte issues
+      fig = plt.figure()
+      ax = fig.subplots(1,1)
+        
+      ax.plot(x,y,c='grey') 
+      ax.plot(x[idx_center_phaseI],y[idx_center_phaseI],label='center of I',marker='*',ls='',ms=10,c='tab:blue') 
+      ax.plot(x[idx_phaseI],y[idx_phaseI],marker='.',ls='',label='phase I',c='tab:blue') 
+
+      ax.plot(x[idx_center_phaseII],y[idx_center_phaseII],label='center of II',marker='*',ls='',ms=10,c='tab:red') 
+      ax.plot(x[idx_phaseII],y[idx_phaseII],marker='.',ls='',label='II',c='tab:red') 
+      ax.plot(x,dydx,marker='.', label='derivative', color='tab:purple') 
+      ylim = ax.get_ylim()
+      ax.plot([x[idx_interface_left]]*2, ylim, ls='--',c='k')
+      ax.plot([x[idx_interface_right]]*2, ylim, ls='--',c='k')
+      ax.legend()
+      plt.show()
     return idx_of_phases, vol_of_phases
    
      
