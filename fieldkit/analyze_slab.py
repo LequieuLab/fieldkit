@@ -34,7 +34,6 @@ def binodal_from_slab(fields, field_idx_for_interfaces=1, interface_scale=1.0, p
     field = fields_1d[field_idx_for_interfaces]
     idx_of_phases, vol_of_phases = _slab_estimate_grid_index_and_volume_of_phases(field,interface_scale, plot=plot)
 
-
     # ---------------------------------------------------
     # calculate average density of each phase and return
     # ---------------------------------------------------
@@ -57,12 +56,23 @@ def binodal_from_slab(fields, field_idx_for_interfaces=1, interface_scale=1.0, p
     for vol in vol_of_phases:
       state['nu'].append(vol)
 
+    # TODO: instead of hardcoding phi and C I should have the user pass an argument so that the raw densities can be output (if appropriate)
+  
+    # set C of each phase (use the total sum of all fields)
+    state['C'] = [0] * nphases
+    for iphase in range(nphases):
+      idx = idx_of_phases[iphase]
+      total_density = 0.0
+      for imol in range(nmolecules):
+        total_density += np.average(fields_1d[imol].data[idx].real) # FIXME: causing runtime warnings and Nan?
+      state['C'][iphase] = total_density
+
     # initialize phi_i's
     for imol in range(nmolecules):
       state[f'phi_{imol}'] = [0] * nphases
 
     # set phi of each molecule in each phase
-    for iphase in range(len(idx_of_phases)):
+    for iphase in range(nphases):
       idx = idx_of_phases[iphase]
       sum_phi = 0
       for imol in range(nmolecules):
