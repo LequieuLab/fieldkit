@@ -18,8 +18,10 @@ def natural_keys(text):
 
 
 parser = argparse.ArgumentParser(description='Convert field .dat files to VTK')
-parser.add_argument('infiles',nargs='*', help='Input filenames of fields')
+parser.add_argument('infiles',nargs='+', help='Input filenames of fields')
+parser.add_argument('--roll',nargs=3, type=float, help='optionally roll the fields across PBC')
 args = parser.parse_args()
+
 #print(args)
 
 # parser
@@ -49,6 +51,10 @@ for infile in args.infiles:
  
     # read file
     fields = fk.read_from_file(infile)
+
+    # optionally roll coords
+    if args.roll:
+      fields = fk.roll(fields,args.roll)
 
     # write to VTK
     fk.write_to_VTK(outfile,fields)
