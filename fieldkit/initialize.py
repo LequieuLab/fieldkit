@@ -42,6 +42,8 @@ def update_species_field_gaussians(field, centers, npw, magnitude, x, y, z):
 
 
 def update_species_field_levelset(phase, field, magnitude, originshift, x, y, z):
+    # See: Wohlgemuth, M., Yufa, N., Hoffman, J. & Thomas, E. L. Triply periodic bicontinuous cubic microdomain morphologies by symmetries. Macromolecules 34, 6083–6089 (2001).
+
     pi = np.pi
 
     xx, yy, zz = np.meshgrid(x, y, z)
@@ -51,12 +53,18 @@ def update_species_field_levelset(phase, field, magnitude, originshift, x, y, z)
     z = zz + originshift[2] # 0.125
 
     if phase == 'double-gyroid':
+        # Fig 2d caption
         field += 0.8*(np.sin(4*pi*x)*np.sin(2*pi*z)*np.cos(2*pi*y) \
                  + np.sin(4*pi*y)*np.sin(2*pi*x)*np.cos(2*pi*z) \
                  + np.sin(4*pi*z)*np.sin(2*pi*y)*np.cos(2*pi*x))\
                  - 0.2*(np.cos(4*pi*x)*np.cos(4*pi*y) \
                    + np.cos(4*pi*y)*np.cos(4*pi*z) \
                    + np.cos(4*pi*z)*np.cos(4*pi*x))
+    elif phase == 'alt-gyroid':
+        # Eq 10 and Fig2a
+        field += np.sin(2*pi*y)*np.cos(2*pi*z) + np.sin(2*pi*z)*np.cos(2*pi*x) \
+                 + np.sin(2*pi*x)*np.cos(2*pi*y)
+
     elif phase == 'single-diamond' or phase == 'alt-diamond':
     # Fig 3a, diamond (Eq 13)
       field -= np.cos(2*pi*x)*np.cos(2*pi*y)*np.cos(2*pi*z) \
@@ -139,11 +147,11 @@ def initialize_phase(phase, npw, h):
     """
     
     sphere_phases = ["A15", "C15", "alt-C15"]
-    levelset_phases = ["double-gyroid", "single-diamond", "alt-diamond"]
+    levelset_phases = ["double-gyroid", "single-diamond", "alt-diamond", "alt-gyroid"]
     
     #parameters for all phases:
     npw = npw
-    magnitude = 10
+    magnitude = -10
     
     x = np.linspace(0,1,npw[0])
     y = np.linspace(0,1,npw[1])
@@ -166,13 +174,17 @@ def initialize_phase(phase, npw, h):
             w_A = initialize_sphere_positions(phase, w_A, npw, magnitude)
         
     elif phase in levelset_phases:
-        nspecies = 2
-        originshift = (0, 0, 0)
         if phase == "double-gyroid":
+            nspecies = 2
             originshift = (0.125, 0.125, 0.125)
-        w_A = update_species_field_levelset(phase, w_A, magnitude, originshift, x, y, z)
+            w_A = update_species_field_levelset(phase, w_A, magnitude, originshift, x, y, z)
 
-        if phase == "alt-diamond":
+        elif phase == "alt-gyroid":
+            nspecies = 3
+            w_A = update_species_field_levelset(phase, w_A, magnitude, (0.125,0.125,0.125), x, y, z)
+            w_C = update_species_field_levelset(phase, w_A, magnitude, (0.625,0.625,0.625), x, y, z)
+
+        elif phase == "alt-diamond":
             nspecies = 3
             w_A = update_species_field_levelset(phase, w_A, magnitude, (0.125,0.125,0.125), x, y, z)
             w_C = update_species_field_levelset(phase, w_C, magnitude, (0.625,0.625,0.625), x, y, z)

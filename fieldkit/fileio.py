@@ -155,10 +155,10 @@ def write_to_file(filename, fields):
       fout.write("%12.10g " % coords[ix][0])
       for n in range(nfields):
         if complexdata:
-          fout.write("%16.10g " % fields[n].data[ix].real)
-          fout.write("%16.10g " % fields[n].data[ix].imag)
+          fout.write("%20.10g " % fields[n].data[ix].real)
+          fout.write("%20.10g " % fields[n].data[ix].imag)
         else:
-          fout.write("%16.10g " % fields[n].data[ix])
+          fout.write("%20.10g " % fields[n].data[ix])
       fout.write("\n")
 
   elif dim == 2:
@@ -168,10 +168,10 @@ def write_to_file(filename, fields):
         fout.write("%12.10g %12.10g " % (coords[ix,iy,0], coords[ix,iy,1]))
         for n in range(nfields):
           if complexdata:
-            fout.write("%16.10g " % (fields[n].data[ix,iy].real))
-            fout.write("%16.10g " % (fields[n].data[ix,iy].imag))
+            fout.write("%20.10g " % (fields[n].data[ix,iy].real))
+            fout.write("%20.10g " % (fields[n].data[ix,iy].imag))
           else:
-            fout.write("%16.10g " % (fields[n].data[ix,iy]))
+            fout.write("%20.10g " % (fields[n].data[ix,iy]))
         fout.write("\n")
       fout.write("\n")
 
@@ -183,10 +183,10 @@ def write_to_file(filename, fields):
           fout.write("%12.10g %12.10g %12.10g" % (coords[ix,iy,iz,0], coords[ix,iy,iz,1],coords[ix,iy,iz,2]))
           for n in range(nfields):
             if complexdata:
-              fout.write("%16.10g " % (fields[n].data[ix,iy,iz].real))
-              fout.write("%16.10g " % (fields[n].data[ix,iy,iz].imag))
+              fout.write("%20.10g " % (fields[n].data[ix,iy,iz].real))
+              fout.write("%20.10g " % (fields[n].data[ix,iy,iz].imag))
             else:
-              fout.write("%16.10g " % (fields[n].data[ix,iy,iz]))
+              fout.write("%20.10g " % (fields[n].data[ix,iy,iz]))
           fout.write("\n")
         fout.write("\n")
 
