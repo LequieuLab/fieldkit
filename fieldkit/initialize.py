@@ -431,7 +431,10 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, types=[], normaliz
 
     # open trajectory using gsd
     import gsd.hoomd
-    t = gsd.hoomd.open(gsdfile,'rb')
+    try:
+        t = gsd.hoomd.open(gsdfile,'rb')
+    except:
+        t = gsd.hoomd.open(gsdfile,'r')
     
     # if only a single frame is specified, turn it into a list
     if type(frames_to_average) == int:
