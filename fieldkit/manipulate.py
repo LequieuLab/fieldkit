@@ -329,3 +329,86 @@ def compress_dimension(fields, dims_to_compress):
       fields_new.append(Field(npw=npw, h=h, data=data))
 
     return fields_new
+
+
+def approx_3dsphere_from_1d(fields_1d, npw_3d):
+    """
+       Transform a 1D field into a 3D field assuming a spherical geometry. 
+       Further assumes that each field in fields_1d has the same cell tensor 
+       and npw, that the field values are symmetrical across the cetner, and
+       that any phase separated dense phase is at the center of the field's 
+       coordinates.
+
+       Args:
+         fields_1d: list of 1D fields
+         npw_3d: npw for the 3D fields
+
+       Returns:
+         fields_3d: list of 3D fields generated from the 1D fields
+    """
+
+    # Create a list for the 3D fields.
+
+    fields_3d = []
+
+    # Get the coordinates at the center of the 3D field and 1D field, and the
+    # distance from the center for each 1D grid point.
+
+    center_1d = [x // 2 for x in fields_1d[0].npw]
+    r0_1d = fields_1d[0].coords[center_1d[0]]
+    dists_1d = np.abs(fields_1d[0].coords - r0_1d)
+
+    # Get the 1D cell tensor and make the 3D cell tensor.
+
+    h_1d = fields_1d[0].h[0][0]
+    h_3d = np.asarray([[h_1d, 0, 0],
+                       [0, h_1d, 0],
+                       [0, 0, h_1d]])
+
+    # Loop through each species in the 1D field.
+
+    nspecies = len(fields_1d)
+    for l in range(nspecies):
+
+        # Create a 3D field of the appropriate size and grid density.
+
+        field_3d = Field(npw=npw_3d, h=h_3d)
+        field_3d.data = field_3d.data.astype(type(fields_1d[l].data[0]))
+
+        # Get the coordinates at the center of the 3D field and 1D field.
+
+        center_3d = [x // 2 for x in npw_3d]
+        r0_3d = field_3d.coords[center_3d[0]][center_3d[1]][center_3d[2]]
+
+        # Loop through each 3D grid point.
+
+        for i in range(npw_3d[0]):
+            for j in range(npw_3d[1]):
+                for k in range(npw_3d[2]):
+
+                    # Get the distance between the center and the point.
+
+                    r_3d = field_3d.coords[i][j][k]
+                    dist_3d = np.linalg.norm(r_3d - r0_3d)
+
+                    # Get the value from the 1D field at the same distance.
+
+                    diff = np.abs(dist_3d - dists_1d)[:, 0]
+                    inds = np.where(diff == diff.min())[0]
+                    val = 0
+                    for ind in inds:
+                        val += fields_1d[l].data[ind]
+                    val /= inds.size
+
+                    # Set the data value in the 3D field.
+
+                    field_3d.data[i][j][k] = val
+
+        # Add the 3D field to the list of 3D fields.
+
+        fields_3d.append(field_3d)
+
+    # Return the list of 3D fields.
+
+    return fields_3d
+
