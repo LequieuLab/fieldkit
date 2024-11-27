@@ -359,6 +359,3 @@ def write_to_VTK(filename, fields):
           o.close(); o = open(filename,'a')
     o.close()
     
-    
-
-    
