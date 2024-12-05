@@ -7,6 +7,7 @@ import numpy as np
 import logging
 import sys
 import os
+import h5py
 
 from .field import *
 
@@ -111,7 +112,7 @@ def write_to_file(filename, fields):
     fields = [fields]
     nfields = len(fields)
 
-  print(f"Writting {nfields} fields to {filename}")
+  print(f"Writing {nfields} fields to {filename}")
 
   # confirm that all fields have same dimension and coords
   for i in range(nfields):
@@ -359,3 +360,127 @@ def write_to_VTK(filename, fields):
           o.close(); o = open(filename,'a')
     o.close()
     
+def write_to_HDF5(filename, fields):
+  """ Creates a HDF5 file based on the fields variable.
+  
+  Args:
+      filename: String for name of file to be written through this function.
+      fields: A list of Fields objects.
+          
+  Returns:
+      A HDF5 file based on fields.
+  
+  Raises:
+      TypeError: if fields is not a list, than make it a one element list.
+  """
+  # check if file is HDF5
+  if not filename.endswith(".h5"):
+    print("Must be an HDF5 file")
+    sys.exit(1)
+
+  try:
+    nfields = len(fields)
+  except TypeError:
+    fields = [fields]
+    nfields = len(fields)
+
+  print(f"Writing {nfields} fields to {filename}")
+
+  # confirm that all fields have same dimension and coords
+  for i in range(nfields):
+    if (i !=0 ):
+      assert (fields[i].dim == fields[i-1].dim)
+      assert (fields[i].npw == fields[i-1].npw)
+      assert (np.all(fields[i].h == fields[i-1].h))
+      assert (np.all(fields[i].is_real_space == fields[i-1].is_real_space))
+      assert (np.all(fields[i].data.dtype == fields[i-1].data.dtype))
+      assert (np.all(fields[i].coords == fields[i-1].coords))
+
+  # set values
+  dim = fields[0].dim 
+  npw = fields[0].npw
+  h = fields[0].h
+  coords = fields[0].coords
+  assert(fields[0].is_real_space), "Can only currently write real space fields"
+  is_real_space = True
+  if fields[0].data.dtype in [np.complex64, np.complex128]:
+    complexdata = True
+  else:
+    complexdata = False
+  kspacedata = (not is_real_space)
+  M = np.prod(npw)
+
+  # begin writing
+  fout = h5py.File(filename, 'w')
+  group = fout.create_group("fields")
+
+  # write attributes
+  group.attrs["cell_tensor"] = h
+  group.attrs.create("complexdata", complexdata, dtype="u1")
+  group.attrs.create("dim", dim, dtype=np.intc)
+  group.attrs.create("kspacedata", kspacedata, dtype="u1")
+  group.attrs["npw"] = npw
+
+  # write datasets
+  for i in range(nfields):
+    if complexdata:
+        data_to_write = fields[i].data
+    else:
+        data_to_write = np.empty(npw, dtype=complex)
+        data_to_write.real = fields[i].data
+    dset = group.create_dataset(f"field{i}", npw, data=data_to_write)
+
+  # close file
+  fout.close()
+
+def read_from_HDF5(filename):
+  """ Reads from HDF5 file and output a list of Field objects.
+  
+  Args:
+      filename: String for name of file to be read through this function.
+          
+  Returns:
+      field_list: A list of Fields objects.
+  """
+  # check if file is HDF5
+  if not filename.endswith(".h5"):
+    print("Must be an HDF5 file")
+    sys.exit(1)
+
+  # open HDF5 file and group
+  f = h5py.File(filename, 'r')
+  group = f["fields"]
+
+  # get values from group attributes
+  nfields = len(group)
+  h = group.attrs["cell_tensor"]
+  complexdata = group.attrs["complexdata"]
+  dim = group.attrs["dim"]
+  kspacedata = group.attrs["kspacedata"]
+  npw = group.attrs["npw"]
+
+  # log attributes
+  logging.info("  * Number of fields = {}".format(nfields))
+  logging.info("  * Number of spatial dimensions = {}".format(dim))
+  if dim == 3:
+    logging.info("  * Grid dimension = {}x{}x{}".format(*npw))
+  elif dim == 2:
+    logging.info("  * Grid dimension = {}x{}".format(*npw))
+  logging.info("  * K-space data? ",kspacedata)
+  logging.info("  * Complex data? ",complexdata)
+  if kspacedata:
+    sys.stderr.write("\nError: k-space data is not supported\n")
+    sys.exit(1)
+
+  # read data to field_list
+  field_list = []
+  for i in range(nfields):
+    data_to_read = group[f"field{i}"][:]
+    if not complexdata:
+        data_to_read = data_to_read.real
+    field_list.append(Field(h=h, npw=npw, data=data_to_read))
+
+  # close file
+  f.close()
+
+  return field_list
