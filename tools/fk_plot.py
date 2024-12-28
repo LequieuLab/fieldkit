@@ -14,7 +14,10 @@ args = parser.parse_args()
 #print(args)
 
 # read file
-fields = fk.read_from_file(args.infile)
+if args.infile.endswith('.dat'):
+  fields = fk.read_from_file(args.infile)
+elif args.infile.endswith('.h5') or args.infile.endswith('.hdf5'):
+  fields = fk.read_from_HDF5(args.infile)
 
 # plot
 fk.plot(fields, dpi=args.dpi, filename=args.outfile, show=args.show, imag=args.imag)

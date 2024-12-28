@@ -443,7 +443,7 @@ def read_from_HDF5(filename):
       field_list: A list of Fields objects.
   """
   # check if file is HDF5
-  if not filename.endswith(".h5"):
+  if not filename.endswith(".h5") and not filename.endswith(".hdf5"):
     print("Must be an HDF5 file")
     sys.exit(1)
 
