@@ -485,7 +485,7 @@ def read_from_HDF5(filename):
 
   return field_list
 
-def write_to_cube_file(prefix, fields):
+def write_to_cube_files(prefix, fields):
     """ Creates a cube file for each Field object in the fields list. Because 
         Field objects lack atoms, each voxel is considered an atom with its
         charge set to its value in the Field object.

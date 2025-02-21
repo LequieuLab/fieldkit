@@ -22,5 +22,5 @@ prefix = args.infile[:args.infile.find('.')]
 
 # convert to cube
 dfields = fk.read_from_file('density.dat')
-fk.write_to_cube_file(prefix, dfields)
+fk.write_to_cube_files(prefix, dfields)
 
