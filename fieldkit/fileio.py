@@ -527,7 +527,7 @@ def write_to_cube_file(prefix, fields):
         # Write the cube file for the given Field object. This follows 
         # https://paulbourke.net/dataformats/cube for formatting.
 
-        with open(f"{prefix}_Field{i}.cube", "w") as o:
+        with open(f"{prefix}_field{i}.cube", "w") as o:
 
             # Write the header.
 
