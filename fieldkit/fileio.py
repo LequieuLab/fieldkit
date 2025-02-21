@@ -228,7 +228,7 @@ def write_to_VTK(filename, fields):
     Returns:
         A VTK file based on fields.
     
-   """
+    """
    
     #Check if vtk file is already in current directory
     #if os.path.isfile(filename):
@@ -484,3 +484,75 @@ def read_from_HDF5(filename):
   f.close()
 
   return field_list
+
+def write_to_cube_file(prefix, fields):
+    """ Creates a cube file for each Field object in the fields list. Because 
+        Field objects lack atoms, each voxel is considered an atom with its
+        charge set to its value in the Field object.
+    
+    Args:
+        prefix: String for the prefix of files written through this function.
+        fields: A list of Field objects.
+  
+    Returns:
+        A cube file for each Field object in the fields list.
+    
+    """
+
+    # Check if the fields are compatible with the cube format.
+
+    for i in range(len(fields)):
+        assert(fields[i].dim == 3), "Field objects are not 3-dimensional"
+        assert(fields[i].is_orthorhombic()), "Field objects are not orthorhombic"
+    for i in range(1,len(fields)):
+        assert(fields[i-1].npw == fields[i].npw), "Field objects have inconsistent npw"
+        assert((fields[i-1].h == fields[i].h).all()), "Field objects have inconsistent cell tensors"
+
+    # Get parameters from the first Field object.
+
+    npw_x = fields[0].npw[0]
+    npw_y = fields[0].npw[1]
+    npw_z = fields[0].npw[2]
+    nvoxels = npw_x * npw_y * npw_z
+    xvoxel_len = fields[0].h[0][0] / npw_x
+    yvoxel_len = fields[0].h[1][1] / npw_y
+    zvoxel_len = fields[0].h[2][2] / npw_z
+
+    # Loop through each Field object in the fields list.
+
+    for i in range(len(fields)):
+        data = fields[i].data.real
+        coords = fields[i].coords
+
+        # Write the cube file for the given Field object. This follows 
+        # https://paulbourke.net/dataformats/cube for formatting.
+
+        with open(f"{prefix}_Field{i}.cube", "w") as o:
+
+            # Write the header.
+
+            o.write(f"GAUSSIAN CUBE FILE WRITTEN BY FIELDKIT\n")
+            o.write(f"OUTER LOOP: X, MIDDLE LOOP: Y, INNER LOOP: Z\n")
+            o.write(f"{nvoxels:>8}    {0:.6f}    {0:.6f}    {0:.6f}\n")
+            o.write(f"{npw_x:>8}    {xvoxel_len:.6f}    {0:.6f}    {0:.6f}\n")
+            o.write(f"{npw_y:>8}    {0:.6f}    {yvoxel_len:.6f}    {0:.6f}\n")
+            o.write(f"{npw_z:>8}    {0:.6f}    {0:.6f}    {zvoxel_len:.6f}\n")
+            for ix in range(npw_x):
+                for iy in range(npw_y):
+                    for iz in range(npw_z):
+                        x = coords[ix][iy][iz][0]
+                        y = coords[ix][iy][iz][1]
+                        z = coords[ix][iy][iz][2]
+                        value = data[ix][iy][iz]
+                        o.write(f"{1:>8}    {value:.6f}    {x:.6f}    {y:.6f}    {z:.6f}\n")
+
+            # Write the volumetric data.
+
+            for ix in range(npw_x):
+                for iy in range(npw_y):
+                    for iz in range(npw_z):
+                        o.write(f"{data[ix][iy][iz]:.5E} ")
+                        if iz % 6 == 5:
+                            o.write("\n")
+                    o.write("\n")
+
