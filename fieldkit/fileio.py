@@ -10,6 +10,7 @@ import os
 import h5py
 
 from .field import *
+from glob import glob
 
 
 def read_from_file(filename): 
@@ -555,4 +556,51 @@ def write_to_cube_files(prefix, fields):
                         if iz % 6 == 5:
                             o.write("\n")
                     o.write("\n")
+
+def read_from_cube_files(prefix):
+    """ Reads cube file(s) and converts them to a list of Field objects.
+
+    Args:
+        prefix: String for the prefix of the cube file(s) read by this function.
+
+    Returns:
+        A list of Field objects.
+
+    """
+
+    # Loop through each cube file.
+
+    field_list = []
+    filepaths = sorted(glob(f"{prefix}_field*.cube"))
+    for filepath in filepaths:
+        with open(filepath, "r") as o:
+            h = np.zeros((3, 3))
+            npw = []
+            values = []
+            for i, line in enumerate(o):
+                if i <= 2:  # Skip the first 3 lines.
+                    continue
+                tokens = line.split()
+                if 3 <= i <= 5:  # Extract the npw and cell tensor.
+                    npw_j = int(tokens[0])
+                    npw.append(npw_j)
+                    h[i-3][i-3] = float(tokens[i-2]) * npw_j
+                else:
+                    if len(tokens) == 6:  # Stop when volumetric data reached.
+                        break
+                    value = float(tokens[1])
+                    values.append(value)
+
+        # Rehape the values given the npw.
+
+        values = np.asarray(values)
+        data = np.reshape(values, npw)
+
+        # Create the Field object and append it to the field list.
+
+        field_list.append(Field(h=h,npw=npw,data=data))
+
+    # Return the list of Field objects.
+
+    return field_list
 
