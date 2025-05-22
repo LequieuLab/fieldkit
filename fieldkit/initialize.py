@@ -431,7 +431,10 @@ def particle_to_field_gsd(gsdfile, frames_to_average, npw, P, types=[], normaliz
 
     # open trajectory using gsd
     import gsd.hoomd
-    t = gsd.hoomd.open(gsdfile,'rb')
+    try:
+        t = gsd.hoomd.open(gsdfile,'rb')
+    except:
+        t = gsd.hoomd.open(gsdfile,'r')
     
     # if only a single frame is specified, turn it into a list
     if type(frames_to_average) == int:
@@ -557,7 +560,7 @@ def add_hockney_eastwood_function(field,center, P, height = 1):
     assert (np.allclose(grid_spacings, grid_spacings[0],atol=5e-2)) #, "voxels must be cubic grid_spacings = {}".format(grid_spacings)
 
     
-    xparticle = center / boxl * npw # xparticle should be in range [0,npw)
+    xparticle = (center + boxl / 2) / boxl * npw # xparticle should be in range [0,npw)
 
     # check that 'center' and 'xparticle' are in appropriate range
     #for d in range(dim):
@@ -627,7 +630,7 @@ def add_hockney_eastwood_functions_jit(data_array, npw, h, centers, types, P, he
       mytype = types[icenter]
       assert(mytype >= 0 and mytype < data_array.shape[0]) # data_array should have length = number of types
 
-      xparticle = center / boxl * npw # xparticle should be in range [0,npw)
+      xparticle = (center + boxl / 2) / boxl * npw # xparticle should be in range [0,npw)
 
       # apply PBC to xparticle
       for idim in range(dim):

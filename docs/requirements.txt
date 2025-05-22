@@ -4,3 +4,5 @@ scikit-image
 matplotlib
 ipython
 numba
+sphinx-rtd-theme
+h5py

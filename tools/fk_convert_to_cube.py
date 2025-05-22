@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+
 from fk_setpath import *
 import fieldkit as fk 
 import argparse
-
 
 parser = argparse.ArgumentParser(description='Plot a field using matplotlib')
 parser.add_argument('infile',help='Input filename of field')
@@ -18,7 +18,9 @@ if args.infile.endswith('.dat'):
   fields = fk.read_from_file(args.infile)
 elif args.infile.endswith('.h5') or args.infile.endswith('.hdf5'):
   fields = fk.read_from_HDF5(args.infile)
+prefix = args.infile[:args.infile.find('.')]
 
-# plot
-fk.plot(fields, dpi=args.dpi, filename=args.outfile, show=args.show, imag=args.imag)
+# convert to cube
+dfields = fk.read_from_file('density.dat')
+fk.write_to_cube_files(prefix, dfields)
 
