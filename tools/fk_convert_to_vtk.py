@@ -50,9 +50,14 @@ for infile in args.infiles:
     print(f"Converting {infile} -> {outfile}")
  
     # read file
-    fields = fk.read_from_file(infile)
-
+    if ext == '.dat':
+        fields = fk.read_from_file(infile)
+    elif ext == '.h5' or ext == '.hdf5':
+        fields = fk.read_from_HDF5(infile)
+    else:
+        raise RuntimeError(f"Invalid {ext = }")
     # optionally roll coords
+
     if args.roll:
       fields = fk.roll(fields,args.roll)
 
